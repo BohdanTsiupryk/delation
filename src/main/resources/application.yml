@@ -1,0 +1,53 @@
+server:
+  port: 9999
+logging:
+  level:
+    web: info
+    root: info
+    bts: debug
+spring:
+
+  freemarker:
+    template-loader-path: classpath:/templates/
+    suffix: .ftl
+    expose-request-attributes: true
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:1}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/bu}
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  security:
+    user:
+      name: u
+      password: u
+
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 536832065598-pielsep4g4mi8cjir805gldpasru8gff.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - openid
+              - email
+              - profile
+#          discord:
+#            client-id: 1106235402081288212
+#            client-secret: nMTJyz5dMhvU5-UDAmdWOXJYO3AlU4Dt
+#            client-authentication-method: post
+#            scope:
+#              - identify
+#              - email
+#            redirect-uri: "{baseUrl}/login/oauth2/code/discord"
+#            client-name: test
+#        provider:
+#          discord:
+#            authorization-uri: https://discordapp.com/api/oauth2/authorize
+#            token-uri: https://discordapp.com/api/oauth2/token
+#            user-info-uri: https://discordapp.com/api/users/@me
+#            user-name-attribute: username
