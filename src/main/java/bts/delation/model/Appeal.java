@@ -1,18 +1,16 @@
 package bts.delation.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.stereotype.Service;
+import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "appeal")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Appeal {
@@ -28,4 +26,10 @@ public class Appeal {
     private List<String> mentions;
 
     private String text;
+
+    @Enumerated(EnumType.STRING)
+    private AppealStatus status;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime createdAt;
 }

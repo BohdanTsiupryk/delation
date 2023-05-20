@@ -5,13 +5,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-
-import static bts.delation.model.UserRole.CLIENT;
 
 @ToString
 public class CustomOAuth2User implements OidcUser {
