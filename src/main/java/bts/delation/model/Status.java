@@ -1,5 +1,5 @@
 package bts.delation.model;
 
-public enum AppealStatus {
+public enum Status {
     NEW, IN_PROGRESS, DONE
 }

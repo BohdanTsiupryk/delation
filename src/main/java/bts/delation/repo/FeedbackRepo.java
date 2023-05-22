@@ -1,13 +1,13 @@
 package bts.delation.repo;
 
-import bts.delation.model.Appeal;
+import bts.delation.model.Feedback;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface AppealRepo extends JpaRepository<Appeal, String> {
+public interface FeedbackRepo extends JpaRepository<Feedback, String> {
 
-    List<Appeal> findByAuthor(String username);
+    List<Feedback> findByAuthor(String username);
 }

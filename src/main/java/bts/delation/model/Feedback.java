@@ -4,16 +4,16 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 @Entity
-@Table(name = "appeal")
+@Table(name = "feedback")
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Appeal {
+public class Feedback {
 
     @Id
     private String id;
@@ -23,12 +23,15 @@ public class Appeal {
     @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "mentions", joinColumns = @JoinColumn(name = "appeal_id"))
     @Column(name = "mention", nullable = false)
-    private List<String> mentions;
+    private Set<String> mentions;
 
     private String text;
 
     @Enumerated(EnumType.STRING)
-    private AppealStatus status;
+    private Status status;
+
+    @Enumerated(EnumType.STRING)
+    private FeedbackType type;
 
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;

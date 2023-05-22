@@ -1,7 +1,7 @@
 package bts.delation.controller;
 
-import bts.delation.model.Appeal;
-import bts.delation.service.AppealService;
+import bts.delation.model.Feedback;
+import bts.delation.service.FeedbackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,17 +13,17 @@ import java.util.List;
 @Controller
 @RequestMapping("/moder/appeal")
 @RequiredArgsConstructor
-public class AppealController {
+public class FeedbackController {
 
-    private final AppealService service;
+    private final FeedbackService service;
 
 
     @GetMapping
     public String page(Model model) {
-        List<Appeal> all = service.getAll();
+        List<Feedback> all = service.getAll();
 
         model.addAttribute("list", all);
 
-        return "appeal";
+        return "feedback";
     }
 }
