@@ -19,14 +19,19 @@ public class Feedback {
     private String id;
 
     @ManyToOne
-    @JoinColumn(name="author_id", nullable=false)
+    @JoinColumn(name = "author_id", nullable = false)
     private DiscordUser author;
+
+    @ManyToOne
+    @JoinColumn(name = "moder_id")
+    private User moder;
 
     @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "mentions", joinColumns = @JoinColumn(name = "feedback_id"))
     @Column(name = "mention", nullable = false)
     private Set<String> mentions;
 
+    @Column(length = 3000)
     private String text;
 
     @Enumerated(EnumType.STRING)
@@ -37,4 +42,20 @@ public class Feedback {
 
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
+
+    public Feedback(String id,
+                    DiscordUser author,
+                    Set<String> mentions,
+                    String text,
+                    Status status,
+                    FeedbackType type,
+                    LocalDateTime createdAt) {
+        this.id = id;
+        this.author = author;
+        this.mentions = mentions;
+        this.text = text;
+        this.status = status;
+        this.type = type;
+        this.createdAt = createdAt;
+    }
 }

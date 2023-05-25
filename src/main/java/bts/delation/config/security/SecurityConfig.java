@@ -46,7 +46,7 @@ public class SecurityConfig  {
 
                     System.out.println(oauthUser);
 
-                    response.sendRedirect("/admin");
+                    response.sendRedirect("/moder/feedback");
                 });
 
         return http.build();

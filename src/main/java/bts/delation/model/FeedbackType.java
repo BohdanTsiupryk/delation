@@ -4,12 +4,12 @@ import java.util.Arrays;
 
 public enum FeedbackType {
 
-    NONE("none", "пусто"),
-    ANOTHER("another", "інше"),
-    FEEDBACK("feedback", "відгук"),
-    APPEAL("appeal", "скарга"),
-    APPEAL_MODER("appeal_moder", "скарга на модера"),
-    BUG("bug", "помилка");
+    NONE("none", "ПУСТО"),
+    ANOTHER("another", "ІНШЕ"),
+    FEEDBACK("feedback", "ВІДГУК"),
+    APPEAL("appeal", "СКАРГА"),
+    APPEAL_MODER("appeal_moder", "СКАРГА НА МОДЕРА"),
+    BUG("bug", "БАГ");
 
     private final String value;
     private final String ua;

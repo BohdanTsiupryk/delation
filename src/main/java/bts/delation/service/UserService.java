@@ -2,11 +2,13 @@ package bts.delation.service;
 
 import bts.delation.exception.NotFoundException;
 import bts.delation.model.User;
+import bts.delation.model.UserRole;
 import bts.delation.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -32,5 +34,9 @@ public class UserService {
 
     public boolean isUserAuthorized(String email) {
         return repo.existsByEmail(email);
+    }
+
+    public Set<User> findModers() {
+        return repo.findAllByUserRoleIn(List.of(UserRole.MODER, UserRole.ADMIN));
     }
 }
