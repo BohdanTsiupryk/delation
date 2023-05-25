@@ -1,6 +1,7 @@
 package bts.delation.discord.listeners;
 
 import bts.delation.discord.templates.ResponseTemplate;
+import bts.delation.model.DiscordUser;
 import bts.delation.model.Feedback;
 import bts.delation.model.FeedbackType;
 import bts.delation.model.Status;
@@ -68,6 +69,8 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
         Set<String> mentionsIds = new HashSet<>();
         StringBuilder text = new StringBuilder(value);
 
+        DiscordUser discordAuthor = discordUserService.getByUsername(author);
+
         int lastIndex = 0;
         while (text.indexOf("<@", lastIndex) != -1) {
             String id = text.substring(text.indexOf("<@", lastIndex) + 2, text.indexOf(">", text.indexOf("<@", lastIndex) + 2));
@@ -94,7 +97,7 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
 
         return feedbackService.save(new Feedback(
                 UUID.randomUUID().toString(),
-                author,
+                discordAuthor,
                 mentions,
                 text.toString(),
                 Status.NEW,

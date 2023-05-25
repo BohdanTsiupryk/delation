@@ -45,6 +45,11 @@ public class DiscordUserService {
         }
     }
 
+    public DiscordUser getByUsername(String username) {
+        return discordUserRepo.findDiscordUserByDiscordUsername(username)
+                .orElseThrow(() -> new NotFoundException("Discord user not found"));
+    }
+
     private boolean syncUserWithMine(String id, String name) {
 
         BandercraftUser userFromMine;

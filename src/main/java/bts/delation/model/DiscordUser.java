@@ -1,13 +1,12 @@
 package bts.delation.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Table
 @Entity
@@ -26,8 +25,18 @@ public class DiscordUser {
 
     private boolean syncWithMine;
 
+    @OneToMany(mappedBy = "author")
+    private List<Feedback> feedbacks;
+
     public DiscordUser(String id, String discordUsername) {
         this.id = id;
         this.discordUsername = discordUsername;
+    }
+
+    public DiscordUser(String id, String discordUsername, String mineUsername, boolean syncWithMine) {
+        this.id = id;
+        this.discordUsername = discordUsername;
+        this.mineUsername = mineUsername;
+        this.syncWithMine = syncWithMine;
     }
 }

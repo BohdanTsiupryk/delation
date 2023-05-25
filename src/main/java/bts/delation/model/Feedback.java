@@ -18,10 +18,12 @@ public class Feedback {
     @Id
     private String id;
 
-    private String author;
+    @ManyToOne
+    @JoinColumn(name="author_id", nullable=false)
+    private DiscordUser author;
 
     @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "mentions", joinColumns = @JoinColumn(name = "appeal_id"))
+    @CollectionTable(name = "mentions", joinColumns = @JoinColumn(name = "feedback_id"))
     @Column(name = "mention", nullable = false)
     private Set<String> mentions;
 

@@ -1,6 +1,7 @@
 package bts.delation.service;
 
 import bts.delation.exception.NotFoundException;
+import bts.delation.model.DiscordUser;
 import bts.delation.model.Feedback;
 import bts.delation.model.Status;
 import bts.delation.repo.FeedbackRepo;
@@ -14,6 +15,7 @@ import java.util.List;
 public class FeedbackService {
 
     private final FeedbackRepo repo;
+    private final DiscordUserService discordUserService;
 
 
     public List<Feedback> getAll() {
@@ -23,7 +25,9 @@ public class FeedbackService {
 
     public List<Feedback> getByAuthor(String username) {
 
-        return repo.findByAuthor(username);
+        DiscordUser user = discordUserService.getByUsername(username);
+
+        return repo.findByAuthor(user);
     }
 
     public Feedback save(Feedback feedback) {

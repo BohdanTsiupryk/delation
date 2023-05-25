@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface DiscordUserRepo extends JpaRepository<DiscordUser, String> {
 
+    Optional<DiscordUser> findDiscordUserByDiscordUsername(String username);
 }
