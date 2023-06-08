@@ -55,4 +55,11 @@ public class CustomOAuth2User implements OidcUser {
     public UserRole getRole() {
         return role;
     }
+
+    public boolean isModer() {
+        return role.equals(UserRole.MODER);
+    }
+    public boolean isAdmin() {
+        return role.equals(UserRole.ADMIN);
+    }
 }

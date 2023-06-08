@@ -57,9 +57,6 @@ public class MessageCreateListener extends MessageListener implements DiscordEve
 
     private boolean isDiscordMineSync(User author) {
 
-
-
-
         return true;
     }
 

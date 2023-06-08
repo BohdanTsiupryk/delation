@@ -24,7 +24,12 @@ public class DiscordUserService {
         return discordUserRepo.save(discordUser);
     }
 
-    public boolean checkUserAutorize(String id,String name) {
+    public DiscordUser getById(String id) {
+        return discordUserRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Discord user not found"));
+    }
+
+    public boolean checkUserAutorize(String id, String name) {
 
         Optional<DiscordUser> byId = discordUserRepo.findById(id);
 
@@ -57,12 +62,12 @@ public class DiscordUserService {
             userFromMine = getUserFromMine(id);
         } catch (NotFoundException e) {
 
-            discordUserRepo.save(new DiscordUser(id, name));
+            save(new DiscordUser(id, name));
 
             return false;
         }
 
-        discordUserRepo.save(new DiscordUser(
+        save(new DiscordUser(
                 id,
                 name,
                 userFromMine.username,
@@ -89,6 +94,9 @@ public class DiscordUserService {
         return exchange.getBody().user();
     }
 
-    record BandercraftUser(long id, String username, String real_name) {}
-    record Wrap(BandercraftUser user) {}
+    record BandercraftUser(long id, String username, String real_name) {
+    }
+
+    record Wrap(BandercraftUser user) {
+    }
 }

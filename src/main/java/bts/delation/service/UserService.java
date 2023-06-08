@@ -39,4 +39,8 @@ public class UserService {
     public Set<User> findModers() {
         return repo.findAllByUserRoleIn(List.of(UserRole.MODER, UserRole.ADMIN));
     }
+
+    public Set<User> findAdmins() {
+        return repo.findAllByUserRoleIn(List.of(UserRole.ADMIN));
+    }
 }

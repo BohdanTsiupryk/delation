@@ -2,7 +2,6 @@ package bts.delation.discord;
 
 import bts.delation.discord.listeners.DiscordEventListener;
 import bts.delation.model.FeedbackType;
-import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
@@ -11,13 +10,10 @@ import discord4j.discordjson.json.*;
 import discord4j.gateway.intent.IntentSet;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Configuration
 public class DiscordConfig {
@@ -33,10 +29,10 @@ public class DiscordConfig {
 
         Long appId = client.getRestClient().getApplicationId().block();
 
-        ApplicationCommandRequest randomCommand = ApplicationCommandRequest.builder()
+        ApplicationCommandRequest feedbackCommand = ApplicationCommandRequest.builder()
                 .name("feedback")
                 .description("Send feedback")
-                .addOption(options())
+                .addOption(optionFeedbackType())
                 .addOption(ApplicationCommandOptionData.builder()
                         .name("value")
                         .description("ваш відгук\\скарга")
@@ -45,10 +41,30 @@ public class DiscordConfig {
                         .build())
                 .build();
 
+        ApplicationCommandRequest statusCommand = ApplicationCommandRequest.builder()
+                .name("status")
+                .description("Check feedback statuses")
+                .build();
+
+        ImmutableApplicationCommandRequest syncCommand = ApplicationCommandRequest.builder()
+                .name("sync")
+                .description("Sync acc with discord")
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("email")
+                        .description("Your email")
+                        .type(ApplicationCommandOption.Type.STRING.getValue())
+                        .required(true)
+                        .build())
+                .build();
+
         client.getRestClient().getApplicationService()
-                .createGuildApplicationCommand(appId, 1106357010334744697L,randomCommand)
+                .bulkOverwriteGuildApplicationCommand(appId, 1106357010334744697L, List.of(feedbackCommand, statusCommand))
                 .subscribe();
 
+        client.getRestClient()
+                .getApplicationService()
+                .createGlobalApplicationCommand(appId, syncCommand)
+                .subscribe();
 
         listeners.forEach(listener -> {
             client.on(listener.getEventType())
@@ -60,7 +76,7 @@ public class DiscordConfig {
         return client;
     }
 
-    private static ImmutableApplicationCommandOptionData options() {
+    private static ImmutableApplicationCommandOptionData optionFeedbackType() {
 
         List<ApplicationCommandOptionChoiceData> collect = Arrays.stream(FeedbackType.values())
                 .map(f -> ApplicationCommandOptionChoiceData.builder()
@@ -78,6 +94,4 @@ public class DiscordConfig {
                 .required(true)
                 .build();
     }
-
-
 }

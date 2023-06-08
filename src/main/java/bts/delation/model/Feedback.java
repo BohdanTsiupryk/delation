@@ -34,6 +34,9 @@ public class Feedback {
     @Column(length = 3000)
     private String text;
 
+    @Column(length = 3000)
+    private String reviewComment;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 

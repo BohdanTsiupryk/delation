@@ -1,30 +1,25 @@
 package bts.delation.discord.listeners;
 
 import bts.delation.discord.templates.ResponseTemplate;
-import bts.delation.model.DiscordUser;
-import bts.delation.model.Feedback;
-import bts.delation.model.FeedbackType;
-import bts.delation.model.Status;
+import bts.delation.model.*;
 import bts.delation.service.DiscordUserService;
 import bts.delation.service.FeedbackService;
+import bts.delation.service.HistoryService;
+import bts.delation.service.UserService;
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteraction;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.component.ActionRow;
 import discord4j.core.object.component.Button;
 import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.User;
 import discord4j.core.spec.InteractionApplicationCommandCallbackSpec;
-import discord4j.core.spec.MessageCreateSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -33,6 +28,8 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
 
     private final FeedbackService feedbackService;
     private final DiscordUserService discordUserService;
+    private final UserService userService;
+    private final HistoryService historyService;
 
     @Override
     public Class<ApplicationCommandInteractionEvent> getEventType() {
@@ -42,17 +39,48 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
     @Override
     public Mono<Void> execute(ApplicationCommandInteractionEvent event) {
 
-        if (!event.getCommandName().equals("feedback")) return Mono.empty();
-        Member member = event.getInteraction().getMember().get();
+        Member member = event.getInteraction().getUser().asMember(Snowflake.of(1106357010334744697L)).block();
 
         if (!discordUserService.checkUserAutorize(member.getId().asString(), member.getUsername())) {
 
             return event.reply(InteractionApplicationCommandCallbackSpec.builder()
-                            .content(ResponseTemplate.UNLINKED)
-                            .addComponent(ActionRow.of(Button.link("https://bcraft.fun/accounts/profile/", "Підключити")))
+                    .content(ResponseTemplate.UNLINKED)
+                    .addComponent(ActionRow.of(Button.link("https://bcraft.fun/accounts/profile/", "Підключити")))
                     .build());
         }
 
+        if (event.getCommandName().equals("feedback")) return processFeedback(event, member);
+        if (event.getCommandName().equals("status")) return processStatus(event, member);
+        if (event.getCommandName().equals("sync")) return processSync(event, member);
+
+        return Mono.empty();
+    }
+
+    private Mono<Void> processSync(ApplicationCommandInteractionEvent event, Member member) {
+
+        Optional<ApplicationCommandInteraction> commandInteraction = event.getInteraction().getCommandInteraction();
+        String email = getOption(commandInteraction, "email");
+
+        User user = userService.getByEmail(email);
+
+        DiscordUser discordUser = discordUserService.getById(member.getId().asString());
+        user.setDiscordUser(discordUser);
+
+        userService.save(user);
+        return event.reply("OK");
+    }
+
+    private Mono<Void> processStatus(ApplicationCommandInteractionEvent event, Member member) {
+
+        List<Feedback> feedbacks = feedbackService.getByAuthor(member.getId().asString());
+
+        StringBuilder sb = new StringBuilder();
+        feedbacks.forEach(f -> sb.append(f.getId()).append("|").append(f.getStatus()).append("|").append(f.getText()).append("\n"));
+
+        return event.reply(String.format("Task list: \n %s", sb));
+    }
+
+    private Mono<Void> processFeedback(ApplicationCommandInteractionEvent event, Member member) {
 
         String author = member.getUsername();
         Optional<ApplicationCommandInteraction> commandInteraction = event.getInteraction().getCommandInteraction();
@@ -61,6 +89,8 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
         String value = getOption(commandInteraction, "value");
 
         Feedback feedback = saveFeedbackToDb(event, author, type, value);
+
+        historyService.taskCreated(feedback, author);
 
         return event.reply(String.format("%s прийнято, дякуємо що робите нас кращими \n |%s|", feedback.getType().getUa(), feedback.getText()));
     }
@@ -92,7 +122,7 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
                     if (start == -1) return;
                     text.replace(start, start + toReplace.length(), m.getUsername());
                 })
-                .map(User::getUsername)
+                .map(member -> member.getUsername())
                 .collect(Collectors.toSet());
 
         return feedbackService.save(new Feedback(

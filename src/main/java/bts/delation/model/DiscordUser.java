@@ -1,10 +1,7 @@
 package bts.delation.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -14,6 +11,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"feedbacks", "user"})
 public class DiscordUser {
 
     @Id
@@ -27,6 +25,9 @@ public class DiscordUser {
 
     @OneToMany(mappedBy = "author")
     private List<Feedback> feedbacks;
+
+    @OneToOne(mappedBy = "discordUser")
+    private User user;
 
     public DiscordUser(String id, String discordUsername) {
         this.id = id;

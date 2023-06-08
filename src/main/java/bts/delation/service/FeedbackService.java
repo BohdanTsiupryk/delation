@@ -3,13 +3,13 @@ package bts.delation.service;
 import bts.delation.exception.NotFoundException;
 import bts.delation.model.DiscordUser;
 import bts.delation.model.Feedback;
-import bts.delation.model.Status;
 import bts.delation.model.User;
 import bts.delation.repo.FeedbackRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +18,7 @@ public class FeedbackService {
     private final FeedbackRepo repo;
     private final DiscordUserService discordUserService;
     private final UserService userService;
+    private final HistoryService historyService;
 
 
     public List<Feedback> getAll() {
@@ -25,13 +26,19 @@ public class FeedbackService {
         return repo.findAll();
     }
 
-    public Feedback getOne(String id) {
-        return getById(id);
+    public Feedback addComment(String id, String comment, String email) {
+
+        Feedback feedback = getById(id);
+        feedback.setReviewComment(comment);
+
+        historyService.addComment(feedback, email, comment);
+
+        return repo.save(feedback);
     }
 
-    public List<Feedback> getByAuthor(String username) {
+    public List<Feedback> getByAuthor(String id) {
 
-        DiscordUser user = discordUserService.getByUsername(username);
+        DiscordUser user = discordUserService.getById(id);
 
         return repo.findByAuthor(user);
     }
@@ -41,25 +48,10 @@ public class FeedbackService {
         return repo.save(feedback);
     }
 
-    public void moveInProgress(String taskId) {
-        Feedback feedback = getById(taskId);
-
-        feedback.setStatus(Status.IN_PROGRESS);
-
-        save(feedback);
-    }
-
-
-    public void moveToDone(String taskId) {
-        Feedback feedback = getById(taskId);
-
-        feedback.setStatus(Status.DONE);
-
-        save(feedback);
-    }
-
-    public void assignModer(String id, String moder) {
+    public void assignModer(String id, String moder, String email) {
         Feedback feedback = getById(id);
+
+        historyService.assignedModer(feedback, email, Objects.isNull(feedback.getModer()) ? "none" : feedback.getModer().getEmail(), moder);
 
         if (moder.equals("none")) {
             feedback.setModer(null);
@@ -72,7 +64,7 @@ public class FeedbackService {
         repo.save(feedback);
     }
 
-    private Feedback getById(String taskId) {
+    public Feedback getById(String taskId) {
         return repo.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Feedback not found"));
     }

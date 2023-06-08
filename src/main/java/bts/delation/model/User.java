@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@ToString(exclude = {"feedbacks"})
 public class User implements UserDetails {
 
     @Id
@@ -28,6 +28,10 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "moder")
     private List<Feedback> feedbacks = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "discord_id", referencedColumnName = "id")
+    private DiscordUser discordUser;
 
     public User(String id, String email, UserRole userRole) {
         this.id = id;
