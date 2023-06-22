@@ -31,7 +31,17 @@
                 text-overflow: ellipsis;
                 max-width: 200px; /* Приклад: обмежити текст до 200px ширини */
             }
+            pre {
+                background-color: #f4f4f4;
+                padding: 10px;
+                overflow-x: auto;
+            }
+
+            code {
+                font-family: 'Courier New', Courier, monospace;
+            }
         </style>
+
     </head>
     <body>
         <#include "navbar.ftl">

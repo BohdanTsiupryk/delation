@@ -5,7 +5,10 @@
     <div>
         <ul>
             <li>
-                <a href="/">Home</a>
+                <a href="/index">Home</a>
+            </li>
+            <li>
+                <a href="/profile">Profile</a>
             </li>
             <li>
                 <a href="/admin">Admin</a>

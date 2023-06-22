@@ -1,4 +1,4 @@
-package bts.delation.model;
+package bts.delation.model.enums;
 
 import org.springframework.security.core.GrantedAuthority;
 

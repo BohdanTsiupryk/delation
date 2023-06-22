@@ -26,7 +26,7 @@ public class DiscordUser {
     @OneToMany(mappedBy = "author")
     private List<Feedback> feedbacks;
 
-    @OneToOne(mappedBy = "discordUser")
+    @OneToOne(mappedBy = "discordUser", fetch = FetchType.LAZY)
     private User user;
 
     public DiscordUser(String id, String discordUsername) {

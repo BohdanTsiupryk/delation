@@ -1,7 +1,7 @@
 package bts.delation.service;
 
 import bts.delation.model.Feedback;
-import bts.delation.model.Status;
+import bts.delation.model.enums.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -48,8 +48,9 @@ public class FeedbackFlowService {
     private void moveInProgress(String taskId) {
         Feedback feedback = feedbackService.getById(taskId);
 
-        feedback.setStatus(Status.IN_PROGRESS);
+        discordNotificationService.notifyTaskStatusChanged(taskId, Status.IN_PROGRESS.name());
 
+        feedback.setStatus(Status.IN_PROGRESS);
 
         feedbackService.save(feedback);
     }
@@ -58,7 +59,7 @@ public class FeedbackFlowService {
     private void moveToDone(String taskId) {
         Feedback feedback = feedbackService.getById(taskId);
 
-        notifyAdmins(taskId, "Task closed");
+        discordNotificationService.notifyTaskStatusChanged(taskId, Status.DONE.name());
 
         feedback.setStatus(Status.DONE);
 
@@ -68,14 +69,10 @@ public class FeedbackFlowService {
     private void moveToValidation(String taskId) {
         Feedback feedback = feedbackService.getById(taskId);
 
-        notifyAdmins(taskId, "Task need validation");
+        discordNotificationService.notifyTaskStatusChanged(taskId, Status.VALIDATION.name());
 
         feedback.setStatus(Status.VALIDATION);
 
         feedbackService.save(feedback);
-    }
-
-    private void notifyAdmins(String taskId, String reason) {
-        discordNotificationService.notifyAdmins(taskId, reason);
     }
 }

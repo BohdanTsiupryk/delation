@@ -11,6 +11,7 @@ public record FeedbackDTO(
        String text,
        String status,
        String type,
+       String attUrl,
        String comment,
        Date date
     ){}

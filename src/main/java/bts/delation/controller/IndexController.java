@@ -6,22 +6,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequestMapping("/index")
 @RequiredArgsConstructor
 public class IndexController {
 
     private final GatewayDiscordClient client;
 
-    @GetMapping("/sss")
+    @GetMapping
     public String sss() {
-
-
-        client.getChannelById(Snowflake.of("1109648083119247530"))
-                .flatMap(c -> c.getRestChannel().createMessage("asd"))
-                .subscribe();
-
-
         return "index";
     }
 }

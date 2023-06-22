@@ -2,7 +2,7 @@ package bts.delation.service;
 
 import bts.delation.model.CustomOAuth2User;
 import bts.delation.model.User;
-import bts.delation.model.UserRole;
+import bts.delation.model.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;

@@ -1,5 +1,6 @@
 package bts.delation.model;
 
+import bts.delation.model.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,7 +30,7 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "moder")
     private List<Feedback> feedbacks = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "discord_id", referencedColumnName = "id")
     private DiscordUser discordUser;
 

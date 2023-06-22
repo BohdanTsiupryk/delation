@@ -1,5 +1,6 @@
 package bts.delation.model;
 
+import bts.delation.model.enums.UserRole;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;

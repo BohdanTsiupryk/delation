@@ -2,7 +2,7 @@ package bts.delation.service;
 
 import bts.delation.exception.NotFoundException;
 import bts.delation.model.User;
-import bts.delation.model.UserRole;
+import bts.delation.model.enums.UserRole;
 import bts.delation.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

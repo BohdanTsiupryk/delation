@@ -1,7 +1,7 @@
 package bts.delation.repo;
 
 import bts.delation.model.User;
-import bts.delation.model.UserRole;
+import bts.delation.model.enums.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

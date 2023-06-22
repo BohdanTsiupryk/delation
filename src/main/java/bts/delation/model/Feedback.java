@@ -1,5 +1,7 @@
 package bts.delation.model;
 
+import bts.delation.model.enums.FeedbackType;
+import bts.delation.model.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,6 +36,8 @@ public class Feedback {
     @Column(length = 3000)
     private String text;
 
+    private String attachmentUrl;
+
     @Column(length = 3000)
     private String reviewComment;
 
@@ -51,6 +55,7 @@ public class Feedback {
                     Set<String> mentions,
                     String text,
                     Status status,
+                    String attachmentUrl,
                     FeedbackType type,
                     LocalDateTime createdAt) {
         this.id = id;
@@ -58,6 +63,7 @@ public class Feedback {
         this.mentions = mentions;
         this.text = text;
         this.status = status;
+        this.attachmentUrl = attachmentUrl;
         this.type = type;
         this.createdAt = createdAt;
     }

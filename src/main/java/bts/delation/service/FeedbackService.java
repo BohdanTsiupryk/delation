@@ -4,10 +4,13 @@ import bts.delation.exception.NotFoundException;
 import bts.delation.model.DiscordUser;
 import bts.delation.model.Feedback;
 import bts.delation.model.User;
+import bts.delation.model.enums.FeedbackType;
+import bts.delation.model.enums.UserRole;
 import bts.delation.repo.FeedbackRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,6 +27,14 @@ public class FeedbackService {
     public List<Feedback> getAll() {
 
         return repo.findAll();
+    }
+
+    public List<Feedback> getAll(UserRole role) {
+        return switch (role) {
+            case ADMIN -> repo.findAll();
+            case MODER -> repo.findAllByTypeNotIn(List.of(FeedbackType.APPEAL_MODER));
+            case CLIENT -> Collections.emptyList();
+        };
     }
 
     public Feedback addComment(String id, String comment, String email) {

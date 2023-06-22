@@ -2,7 +2,7 @@ package bts.delation.controller;
 
 import bts.delation.model.CustomOAuth2User;
 import bts.delation.model.User;
-import bts.delation.model.UserRole;
+import bts.delation.model.enums.UserRole;
 import bts.delation.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

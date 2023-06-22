@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequiredArgsConstructor
 public class LoginController {
 
-
-
     @GetMapping("/logout")
     public String logout() {
         SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);

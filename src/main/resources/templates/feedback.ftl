@@ -54,6 +54,13 @@
             <li><i>created</i> - ${feedback.date()?string("HH:mm:ss dd/MM/yyyy")}
                 <hr>
             </li>
+            <li><i>attachment</i> -
+                <#if feedback.attUrl()??>
+                    <img src="${feedback.attUrl()}" alt="${feedback.attUrl()}" height="300px" width="300px">
+                    <a href="${feedback.attUrl()}">original</a>
+                </#if>
+                <hr>
+            </li>
             <li><i>review comment</i>:
                 <form method="post" action="/moder/feedback/add-comment">
                     <textarea rows="4" cols="50"

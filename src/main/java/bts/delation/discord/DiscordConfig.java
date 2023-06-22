@@ -1,7 +1,7 @@
 package bts.delation.discord;
 
 import bts.delation.discord.listeners.DiscordEventListener;
-import bts.delation.model.FeedbackType;
+import bts.delation.model.enums.FeedbackType;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
@@ -35,9 +35,15 @@ public class DiscordConfig {
                 .addOption(optionFeedbackType())
                 .addOption(ApplicationCommandOptionData.builder()
                         .name("value")
-                        .description("ваш відгук\\скарга")
+                        .description("ваш відгук/скарга")
                         .type(ApplicationCommandOption.Type.STRING.getValue())
                         .required(true)
+                        .build())
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("attachment")
+                        .description("додатки")
+                        .type(ApplicationCommandOption.Type.ATTACHMENT.getValue())
+                        .required(false)
                         .build())
                 .build();
 
@@ -50,8 +56,8 @@ public class DiscordConfig {
                 .name("sync")
                 .description("Sync acc with discord")
                 .addOption(ApplicationCommandOptionData.builder()
-                        .name("email")
-                        .description("Your email")
+                        .name("code")
+                        .description("Your code")
                         .type(ApplicationCommandOption.Type.STRING.getValue())
                         .required(true)
                         .build())

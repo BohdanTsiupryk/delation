@@ -1,6 +1,7 @@
 package bts.delation.service;
 
 import bts.delation.model.*;
+import bts.delation.model.enums.Status;
 import bts.delation.repo.HistoryRecordRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class HistoryService {
                 .type(HistoryRecord.HistoryType.CREATED)
                 .feedback(feedback)
                 .author(author)
+                .time(LocalDateTime.now())
                 .build();
 
         repository.save(record);

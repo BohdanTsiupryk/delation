@@ -21,9 +21,8 @@ public class DiscordNotificationService {
 
     private static final String GUILD_ID = "1106357010334744697";
 
-    public void notifyAdmins(String feedbackId, String reason) {
+    public void notifyAdmins(String reason) {
 
-        Feedback feedback = feedbackService.getById(feedbackId);
         Set<Snowflake> snowflakes = userService.findAdmins()
                 .stream()
                 .filter(u -> Objects.nonNull(u.getDiscordUser()))
@@ -33,8 +32,18 @@ public class DiscordNotificationService {
         client.getGuildById(Snowflake.of(GUILD_ID))
                 .flatMap(g ->
                         g.requestMembers(snowflakes)
-                                .flatMap(m -> m.getPrivateChannel().flatMap(c -> c.createMessage(String.format("Task %s was updated: %s", feedback.getId(), reason))))
+                                .flatMap(m -> m.getPrivateChannel().flatMap(c -> c.createMessage(reason)))
                                 .then()
                 ).subscribe();
+    }
+
+    public void notifyTaskStatusChanged(String feedbackId, String newStatus) {
+        Feedback feedback = feedbackService.getById(feedbackId);
+
+        notifyAdmins(String.format("Task %s was updated: %s", feedback.getId(), newStatus));
+    }
+
+    public void notifyAdminModerAppeal(String feedbackId) {
+        notifyAdmins("New appeal on moderator");
     }
 }

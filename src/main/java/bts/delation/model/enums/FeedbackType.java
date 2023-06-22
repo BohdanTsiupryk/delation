@@ -1,4 +1,4 @@
-package bts.delation.model;
+package bts.delation.model.enums;
 
 import java.util.Arrays;
 

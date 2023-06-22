@@ -1,11 +1,13 @@
 package bts.delation.discord.listeners;
 
 import bts.delation.discord.templates.ResponseTemplate;
-import bts.delation.model.*;
-import bts.delation.service.DiscordUserService;
-import bts.delation.service.FeedbackService;
-import bts.delation.service.HistoryService;
-import bts.delation.service.UserService;
+import bts.delation.model.DiscordUser;
+import bts.delation.model.Feedback;
+import bts.delation.model.SyncCode;
+import bts.delation.model.User;
+import bts.delation.model.enums.FeedbackType;
+import bts.delation.model.enums.Status;
+import bts.delation.service.*;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteraction;
@@ -30,6 +32,7 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
     private final DiscordUserService discordUserService;
     private final UserService userService;
     private final HistoryService historyService;
+    private final SyncService syncService;
 
     @Override
     public Class<ApplicationCommandInteractionEvent> getEventType() {
@@ -59,9 +62,11 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
     private Mono<Void> processSync(ApplicationCommandInteractionEvent event, Member member) {
 
         Optional<ApplicationCommandInteraction> commandInteraction = event.getInteraction().getCommandInteraction();
-        String email = getOption(commandInteraction, "email");
+        String code = getOption(commandInteraction, "code");
 
-        User user = userService.getByEmail(email);
+        SyncCode syncCode = syncService.getByCode(code);
+
+        User user = userService.getById(syncCode.getUserId());
 
         DiscordUser discordUser = discordUserService.getById(member.getId().asString());
         user.setDiscordUser(discordUser);
@@ -87,15 +92,28 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
 
         FeedbackType type = FeedbackType.getTypeByValue(getOption(commandInteraction, "type"));
         String value = getOption(commandInteraction, "value");
-
-        Feedback feedback = saveFeedbackToDb(event, author, type, value);
+        String url = getAttachment(commandInteraction, "attachment");
+        Feedback feedback = saveFeedbackToDb(event, author, type, value, url);
 
         historyService.taskCreated(feedback, author);
 
         return event.reply(String.format("%s прийнято, дякуємо що робите нас кращими \n |%s|", feedback.getType().getUa(), feedback.getText()));
     }
 
-    private Feedback saveFeedbackToDb(ApplicationCommandInteractionEvent event, String author, FeedbackType type, String value) {
+    private String getAttachment(Optional<ApplicationCommandInteraction> commandInteraction, String attachment) {
+        return commandInteraction.flatMap(ci -> ci.getOption(attachment))
+                .flatMap(ApplicationCommandInteractionOption::getValue)
+                .map(applicationCommandInteractionOptionValue -> applicationCommandInteractionOptionValue.asAttachment().getUrl())
+                .orElse("");
+    }
+
+    private String getOption(Optional<ApplicationCommandInteraction> commandInteraction, String value) {
+        return commandInteraction
+                .flatMap(ci -> ci.getOption(value))
+                .flatMap(ApplicationCommandInteractionOption::getValue).get().getRaw();
+    }
+
+    private Feedback saveFeedbackToDb(ApplicationCommandInteractionEvent event, String author, FeedbackType type, String value, String url) {
         Set<String> mentionsIds = new HashSet<>();
         StringBuilder text = new StringBuilder(value);
 
@@ -131,14 +149,9 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
                 mentions,
                 text.toString(),
                 Status.NEW,
+                url,
                 type,
                 LocalDateTime.now()
         ));
-    }
-
-    private String getOption(Optional<ApplicationCommandInteraction> commandInteraction, String value) {
-        return commandInteraction
-                .flatMap(ci -> ci.getOption(value))
-                .flatMap(ApplicationCommandInteractionOption::getValue).get().getRaw();
     }
 }

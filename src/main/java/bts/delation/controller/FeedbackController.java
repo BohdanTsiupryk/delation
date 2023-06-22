@@ -1,6 +1,8 @@
 package bts.delation.controller;
 
-import bts.delation.model.*;
+import bts.delation.model.CustomOAuth2User;
+import bts.delation.model.Feedback;
+import bts.delation.model.enums.Status;
 import bts.delation.model.dto.FeedbackDTO;
 import bts.delation.model.dto.HistoryRecordDTO;
 import bts.delation.model.dto.UserDTO;
@@ -14,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Comparator;
 import java.util.Date;
@@ -33,8 +34,11 @@ public class FeedbackController {
 
 
     @GetMapping
-    public String page(Model model) {
-        List<FeedbackDTO> all = feedbackService.getAll()
+    public String page(
+            @AuthenticationPrincipal CustomOAuth2User user,
+            Model model
+    ) {
+        List<FeedbackDTO> all = feedbackService.getAll(user.getRole())
                 .stream()
                 .map(this::mapToDto)
                 .toList();
@@ -134,6 +138,7 @@ public class FeedbackController {
                 feedback.getText(),
                 feedback.getStatus().name(),
                 feedback.getType().getUa(),
+                feedback.getAttachmentUrl(),
                 feedback.getReviewComment(),
                 Date.from(feedback.getCreatedAt().toInstant(ZoneOffset.UTC))
         );
