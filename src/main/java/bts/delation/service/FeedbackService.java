@@ -29,10 +29,12 @@ public class FeedbackService {
         return repo.findAll();
     }
 
-    public List<Feedback> getAll(UserRole role) {
+    public List<Feedback> getAll(UserRole role, FeedbackType feedbackType) {
+
+        List<Feedback> feedbacks = feedbackType == null ? repo.findAll() : repo.findAllByType(feedbackType);
         return switch (role) {
-            case ADMIN -> repo.findAll();
-            case MODER -> repo.findAllByTypeNotIn(List.of(FeedbackType.APPEAL_MODER));
+            case ADMIN -> feedbacks;
+            case MODER -> feedbacks.stream().filter(feedback -> !feedback.getType().equals(FeedbackType.APPEAL_MODER)).toList();
             case CLIENT -> Collections.emptyList();
         };
     }

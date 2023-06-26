@@ -5,6 +5,19 @@
 <@c.page>
     <#if role == "ADMIN" || role == "MODER">
 
+        <div>
+            <a href="/moder/feedback">clear filters</a>
+        </div>
+        <div>
+            <form method="get" action="/moder/feedback">
+                <select name="type">
+                    <#list types as type>
+                        <option value="${type}">${type}</option>
+                    </#list>
+                </select>
+                <input type="submit" value="filter">
+            </form>
+        </div>
         <table>
             <tr>
                 <th>ID</th>
@@ -28,14 +41,15 @@
                             <select name="moder">
                                 <#list moders as mod>
                                     <option value="none" selected>none</option>
-                                    <option value="${mod.id()}" <#if mod.name() == l.moder()>selected</#if>>${mod.name()}</option>
+                                    <option value="${mod.id()}"
+                                            <#if mod.name() == l.moder()>selected</#if>>${mod.name()}</option>
                                 </#list>
                             </select>
                             <input type="hidden" name="id" value="${l.id()}">
                             <input type="submit" value="assign">
                         </form>
                     </td>
-                    <td><#list l.mentions() as m>@${m} | </#list></td>
+                    <td><#list l.mentions() as m>@${m}<#sep>,</#list></td>
                     <td>${l.status()}</td>
                     <td>${l.date()?string("HH:mm:ss dd/MM/yyyy")}</td>
                     <td><a href="/moder/feedback/${l.id()}">open</a></td>

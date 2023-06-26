@@ -8,7 +8,7 @@
         <ol>
 
             <#list users as usr>
-                <li>${usr.id} - ${usr.email} - ${usr.userRole} -
+                <li><a href="/profile?id=${usr.id}">${usr.id}</a> - ${usr.email} - ${usr.userRole} -
 
                     <form method="post" action="/admin/change-role">
                         <select name="activeRole">

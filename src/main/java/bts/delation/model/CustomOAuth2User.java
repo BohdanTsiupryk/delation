@@ -18,9 +18,15 @@ public class CustomOAuth2User implements OidcUser {
 
     private UserRole role;
 
+    private String id;
+
+    private String email;
+
     public CustomOAuth2User(OidcUser oidcUser, UserRole role) {
         this.oidcUser = oidcUser;
         this.role = role;
+        this.id = oidcUser.getClaimAsString("sub");
+        this.email = oidcUser.getClaimAsString("email");
     }
 
     @Override
@@ -55,6 +61,15 @@ public class CustomOAuth2User implements OidcUser {
 
     public UserRole getRole() {
         return role;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String getEmail() {
+        return email;
     }
 
     public boolean isModer() {

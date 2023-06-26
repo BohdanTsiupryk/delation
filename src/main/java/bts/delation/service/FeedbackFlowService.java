@@ -48,7 +48,7 @@ public class FeedbackFlowService {
     private void moveInProgress(String taskId) {
         Feedback feedback = feedbackService.getById(taskId);
 
-        discordNotificationService.notifyTaskStatusChanged(taskId, Status.IN_PROGRESS.name());
+        discordNotificationService.notifyTaskStatusChanged(taskId, Status.IN_PROGRESS);
 
         feedback.setStatus(Status.IN_PROGRESS);
 
@@ -59,7 +59,7 @@ public class FeedbackFlowService {
     private void moveToDone(String taskId) {
         Feedback feedback = feedbackService.getById(taskId);
 
-        discordNotificationService.notifyTaskStatusChanged(taskId, Status.DONE.name());
+        discordNotificationService.notifyTaskStatusChanged(taskId, Status.DONE);
 
         feedback.setStatus(Status.DONE);
 
@@ -69,7 +69,7 @@ public class FeedbackFlowService {
     private void moveToValidation(String taskId) {
         Feedback feedback = feedbackService.getById(taskId);
 
-        discordNotificationService.notifyTaskStatusChanged(taskId, Status.VALIDATION.name());
+        discordNotificationService.notifyTaskStatusChanged(taskId, Status.VALIDATION);
 
         feedback.setStatus(Status.VALIDATION);
 

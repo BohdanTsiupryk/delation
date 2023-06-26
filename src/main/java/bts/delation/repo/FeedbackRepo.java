@@ -14,4 +14,6 @@ public interface FeedbackRepo extends JpaRepository<Feedback, String> {
     List<Feedback> findByAuthor(DiscordUser user);
 
     List<Feedback> findAllByTypeNotIn(List<FeedbackType> type);
+
+    List<Feedback> findAllByType(FeedbackType type);
 }

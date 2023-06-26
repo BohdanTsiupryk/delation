@@ -40,6 +40,9 @@
             code {
                 font-family: 'Courier New', Courier, monospace;
             }
+            #hidden {
+                visibility: hidden;
+            }
         </style>
 
     </head>

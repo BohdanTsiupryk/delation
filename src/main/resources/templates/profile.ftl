@@ -3,6 +3,7 @@
 
 
 <@c.page>
+    <#assign sameUser = (principal.id == prof.id())>
 
     <ul>
         <li><i>ID</i> - ${prof.id()}
@@ -21,7 +22,7 @@
             <#else>
                 <#if discordCode??><i>Введіть цей код нашому боту, через команду <b>/sync</b></i>
 
-                    <div>
+                    <div <#if !sameUser> id="hidden" </#if> >
                         <pre>
                           <code>
                                ${discordCode}
@@ -35,11 +36,11 @@
             </#if>
             <hr>
         </li>
-        <li><i>SYNCED WITH MINE</i>
+        <li ><i>SYNCED WITH MINE</i>
             <#if prof.mineSynced()>
                 <b style="color: green">Профіль синхронізований з майнкрафтом</b><br>
             <#else>
-                <b style="color: red">Схоже ваш профіль не синхронізований з майнкрафтом <a
+                <b style="color: red">Схоже ваш профіль не синхронізований з майнкрафтом <a <#if !sameUser> id="hidden" </#if>
                             href="https://bcraft.fun/accounts/profile/">Connect</a></b><br>
             </#if>
             <hr>

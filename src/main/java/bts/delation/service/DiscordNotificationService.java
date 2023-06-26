@@ -1,6 +1,7 @@
 package bts.delation.service;
 
 import bts.delation.model.Feedback;
+import bts.delation.model.enums.Status;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class DiscordNotificationService {
                 ).subscribe();
     }
 
-    public void notifyTaskStatusChanged(String feedbackId, String newStatus) {
+    public void notifyTaskStatusChanged(String feedbackId, Status newStatus) {
         Feedback feedback = feedbackService.getById(feedbackId);
 
         notifyAdmins(String.format("Task %s was updated: %s", feedback.getId(), newStatus));

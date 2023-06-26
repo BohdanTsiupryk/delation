@@ -2,6 +2,7 @@ package bts.delation.controller;
 
 import bts.delation.model.CustomOAuth2User;
 import bts.delation.model.Feedback;
+import bts.delation.model.enums.FeedbackType;
 import bts.delation.model.enums.Status;
 import bts.delation.model.dto.FeedbackDTO;
 import bts.delation.model.dto.HistoryRecordDTO;
@@ -20,6 +21,7 @@ import java.time.ZoneOffset;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Controller
@@ -32,14 +34,18 @@ public class FeedbackController {
     private final UserService userService;
     private final HistoryService historyService;
 
-
     @GetMapping
     public String page(
             @AuthenticationPrincipal CustomOAuth2User user,
+            @RequestParam(required = false) String type,
             Model model
     ) {
-        List<FeedbackDTO> all = feedbackService.getAll(user.getRole())
+        FeedbackType feedbackType = parseType(type);
+
+        List<FeedbackDTO> all = feedbackService.getAll(user.getRole(), feedbackType)
                 .stream()
+                .sorted(Comparator.comparing(Feedback::getCreatedAt).reversed())
+                .sorted(Comparator.comparing(feedback -> feedback.getStatus().priority()))
                 .map(this::mapToDto)
                 .toList();
         List<UserDTO> moders = userService.findModers()
@@ -49,6 +55,7 @@ public class FeedbackController {
 
         model.addAttribute("list", all);
         model.addAttribute("moders", moders);
+        model.addAttribute("types", FeedbackType.values());
 
         return "feedbacks";
     }
@@ -75,7 +82,7 @@ public class FeedbackController {
                         hr.getComment(),
                         Date.from(hr.getTime().toInstant(ZoneOffset.UTC))
                 ))
-                .sorted(Comparator.comparing(HistoryRecordDTO::time))
+                .sorted(Comparator.comparing(HistoryRecordDTO::time).reversed())
                 .collect(Collectors.toList());
 
         model.addAttribute("feedback", feedbackDTO);
@@ -96,7 +103,7 @@ public class FeedbackController {
             return "redirect:/index";
         }
 
-        feedbackService.addComment(id, comment, (String) user.getClaims().get("email"));
+        feedbackService.addComment(id, comment, user.getEmail());
 
         return "redirect:/moder/feedback";
     }
@@ -111,7 +118,7 @@ public class FeedbackController {
             return "redirect:/index";
         }
 
-        feedbackFlowService.manageStatusFlow(id, Status.valueOf(status), (String) user.getClaims().get("email"));
+        feedbackFlowService.manageStatusFlow(id, Status.valueOf(status), user.getEmail());
 
         return "redirect:/moder/feedback";
     }
@@ -123,11 +130,19 @@ public class FeedbackController {
             @AuthenticationPrincipal CustomOAuth2User user,
             Model model
     ) {
-        feedbackService.assignModer(id, moder, (String) user.getClaims().get("email"));
+        feedbackService.assignModer(id, moder, user.getEmail());
 
         return "redirect:/moder/feedback";
     }
 
+
+    private static FeedbackType parseType(String type) {
+        FeedbackType feedbackType = null;
+        if (Objects.nonNull(type)) {
+            feedbackType = FeedbackType.valueOf(type);
+        }
+        return feedbackType;
+    }
 
     public FeedbackDTO mapToDto(Feedback feedback) {
         return new FeedbackDTO(

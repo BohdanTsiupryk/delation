@@ -1,7 +1,6 @@
 <#include "security.ftl">
 
 <nav>
-    <a href="/">Sweater</a>
     <div>
         <ul>
             <li>

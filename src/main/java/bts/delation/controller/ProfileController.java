@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,9 +32,12 @@ public class ProfileController {
     @GetMapping
     public String profile(
             @AuthenticationPrincipal CustomOAuth2User user,
+            @RequestParam(required = false) String id,
             Model model
     ) {
-        User byId = userService.getById((String) user.getClaims().get("sub"));
+        User byId = id == null
+                ? userService.getById(user.getId())
+                : userService.getById(id);
         ProfileUserDto profileUserDto = Optional.of(byId)
                 .map(u -> {
                     Optional<DiscordUser> discordUser = Optional.ofNullable(u.getDiscordUser());
@@ -64,7 +68,7 @@ public class ProfileController {
     public String syncDiscord(@AuthenticationPrincipal CustomOAuth2User user,
                               Model model) {
 
-        User byId = userService.getById((String) user.getClaims().get("sub"));
+        User byId = userService.getById(user.getId());
         if (Objects.isNull(byId.getDiscordUser())) {
             syncService.createCode(byId, SyncTarget.DISCORD);
         }

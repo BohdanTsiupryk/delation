@@ -55,9 +55,9 @@
                 <hr>
             </li>
             <li><i>attachment</i> -
-                <#if feedback.attUrl()??>
-                    <img src="${feedback.attUrl()}" alt="${feedback.attUrl()}" height="300px" width="300px">
-                    <a href="${feedback.attUrl()}">original</a>
+                <#if feedback.attUrl()?? && !(feedback.attUrl() == '')>
+                        <img src="${feedback.attUrl()}" alt="${feedback.attUrl()}" height="300px" width="300px">
+                        <a href="${feedback.attUrl()}">original</a>
                 </#if>
                 <hr>
             </li>
