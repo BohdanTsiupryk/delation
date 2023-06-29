@@ -105,7 +105,7 @@ public class FeedbackController {
 
         feedbackService.addComment(id, comment, user.getEmail());
 
-        return "redirect:/moder/feedback";
+        return "redirect:/moder/feedback/" + id;
     }
 
     @PostMapping("/move")
@@ -120,18 +120,24 @@ public class FeedbackController {
 
         feedbackFlowService.manageStatusFlow(id, Status.valueOf(status), user.getEmail());
 
-        return "redirect:/moder/feedback";
+        return "redirect:/moder/feedback/" + id;
     }
 
     @PostMapping("/assign")
     public String assign(
             @RequestParam String moder,
             @RequestParam String id,
+            @RequestParam String from,
             @AuthenticationPrincipal CustomOAuth2User user,
             Model model
     ) {
         feedbackService.assignModer(id, moder, user.getEmail());
 
+        if (from.equals("list")) {
+            return "redirect:/moder/feedback";
+        } else if (from.equals("single")) {
+            return "redirect:/moder/feedback/" + id;
+        }
         return "redirect:/moder/feedback";
     }
 

@@ -4,6 +4,8 @@ import bts.delation.model.DiscordUser;
 import bts.delation.model.Feedback;
 import bts.delation.model.enums.FeedbackType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,5 +17,9 @@ public interface FeedbackRepo extends JpaRepository<Feedback, String> {
 
     List<Feedback> findAllByTypeNotIn(List<FeedbackType> type);
 
-    List<Feedback> findAllByType(FeedbackType type);
+    @Query(value = "from Feedback f where f.status != 'DONE' and f.status != 'CANCELED'")
+    List<Feedback> findAllNotDone();
+
+    @Query(value = "from Feedback f where f.type = :type")
+    List<Feedback> findAllByType(@Param("type") FeedbackType type);
 }

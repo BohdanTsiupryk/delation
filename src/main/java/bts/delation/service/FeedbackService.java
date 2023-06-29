@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class FeedbackService {
 
     public List<Feedback> getAll(UserRole role, FeedbackType feedbackType) {
 
-        List<Feedback> feedbacks = feedbackType == null ? repo.findAll() : repo.findAllByType(feedbackType);
+        List<Feedback> feedbacks = feedbackType == null ? repo.findAllNotDone() : repo.findAllByType(feedbackType);
         return switch (role) {
             case ADMIN -> feedbacks;
             case MODER -> feedbacks.stream().filter(feedback -> !feedback.getType().equals(FeedbackType.APPEAL_MODER)).toList();
@@ -61,20 +62,32 @@ public class FeedbackService {
         return repo.save(feedback);
     }
 
-    public void assignModer(String id, String moder, String email) {
-        Feedback feedback = getById(id);
+    public void assignModer(String feedbackId, String moderId, String email) {
+        Feedback feedback = getById(feedbackId);
 
-        historyService.assignedModer(feedback, email, Objects.isNull(feedback.getModer()) ? "none" : feedback.getModer().getEmail(), moder);
+        Optional<User> moder = Optional.ofNullable(feedback.getModer());
 
-        if (moder.equals("none")) {
+        if (isSameModer(moderId, moder) || isVitya(moderId, moder)) return;
+
+        if (moderId.equals("none")) {
             feedback.setModer(null);
         } else {
-            User user = userService.getById(moder);
+            User user = userService.getById(moderId);
 
             feedback.setModer(user);
         }
 
+        historyService.assignedModer(feedback, email, Objects.isNull(feedback.getModer()) ? "none" : feedback.getModer().getEmail(), moderId);
+
         repo.save(feedback);
+    }
+
+    private static boolean isVitya(String moderId, Optional<User> moder) {
+        return moder.isEmpty() && (moderId.equals("none"));
+    }
+
+    private static boolean isSameModer(String moderId, Optional<User> moder) {
+        return moder.isPresent() && moder.get().getId().equals(moderId);
     }
 
     public Feedback getById(String taskId) {

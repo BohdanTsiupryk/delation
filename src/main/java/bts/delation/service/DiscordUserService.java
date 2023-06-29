@@ -34,6 +34,7 @@ public class DiscordUserService {
         Optional<DiscordUser> byId = discordUserRepo.findById(id);
 
         if (byId.isEmpty()) return syncUserWithMine(id, name);
+
         DiscordUser discordUser = byId.get();
         if (discordUser.isSyncWithMine()) return true;
 

@@ -5,52 +5,23 @@
     <head>
         <meta charset="UTF-8"/>
         <title>Index</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
         <style>
-            table {
-                font-family: arial, sans-serif;
-                border-collapse: collapse;
-                width: 100%;
-            }
-
-            td, th {
-                border: 1px solid #dddddd;
-                text-align: left;
-                padding: 8px;
-            }
-
-            tr:nth-child(even) {
-                background-color: #dddddd;
-            }
-
-            .text-min-limit {
-                min-width: 100px; /* Мінімальна ширина текстового елемента */
-            }
-            .text-limit {
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                max-width: 200px; /* Приклад: обмежити текст до 200px ширини */
-            }
-            pre {
-                background-color: #f4f4f4;
-                padding: 10px;
-                overflow-x: auto;
-            }
-
-            code {
-                font-family: 'Courier New', Courier, monospace;
-            }
-            #hidden {
-                visibility: hidden;
+            .table-container {
+                width: 90%;
+                margin: auto;
             }
         </style>
-
     </head>
     <body>
         <#include "navbar.ftl">
-    <div class="container mt-5">
+    <div class="container-fluid mt-5">
         <#nested>
     </div>
+
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     </body>
     </html>
 </#macro>

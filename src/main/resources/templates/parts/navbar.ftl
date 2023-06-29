@@ -1,23 +1,28 @@
 <#include "security.ftl">
 
 <nav>
-    <div>
-        <ul>
-            <li>
-                <a href="/index">Home</a>
-            </li>
-            <li>
-                <a href="/profile">Profile</a>
-            </li>
-            <li>
-                <a href="/admin">Admin</a>
-            </li>
-            <li>
-                <a href="/moder/feedback">Feedback</a>
-            </li>
-            <li>
-                <a href="/logout">EXIT</a>
-            </li>
-        </ul>
-    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/index">My Application</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/moder/feedback">Feedback List</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">Admin Page</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 </nav>

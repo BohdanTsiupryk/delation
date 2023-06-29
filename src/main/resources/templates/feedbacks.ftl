@@ -18,7 +18,35 @@
                 <input type="submit" value="filter">
             </form>
         </div>
-        <table>
+        <div class="mb-4">
+            <h5>Filters</h5>
+            <form>
+                <div class="form-row">
+                    <div class="col">
+                        <label for="categoryFilter">Category:</label>
+                        <select class="form-control" id="categoryFilter">
+                            <option value="">All</option>
+                            <option value="Bug">Bug</option>
+                            <option value="Suggestion">Suggestion</option>
+                            <option value="Enhancement">Enhancement</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="statusFilter">Status:</label>
+                        <select class="form-control" id="statusFilter">
+                            <option value="">All</option>
+                            <option value="Open">Open</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">Apply Filters</button>
+            </form>
+        </div>
+        <table class="table table-striped">
+            <thead>
+
             <tr>
                 <th>ID</th>
                 <th>type</th>
@@ -28,19 +56,20 @@
                 <th>mentions</th>
                 <th>status</th>
                 <th>created</th>
-                <th></th>
             </tr>
+            </thead>
+            <tbody>
             <#list list as l>
                 <tr>
-                    <td title="${l.id()}">${l.id()?substring(0, 8)}...</td>
+                    <td title="${l.id()}"><a href="/moder/feedback/${l.id()}" target="_blank">${l.id()?substring(0, 8)}...</a></td>
                     <td>${l.type()}</td>
                     <td class="text-limit" title="${l.text()}">${l.text()}</td>
                     <td>${l.author()}</td>
                     <td>
-                        <form method="post" action="/moder/feedback/assign">
+                        <form method="post" action="/moder/feedback/assign?from=list">
                             <select name="moder">
+                                <option value="none" selected>none</option>
                                 <#list moders as mod>
-                                    <option value="none" selected>none</option>
                                     <option value="${mod.id()}"
                                             <#if mod.name() == l.moder()>selected</#if>>${mod.name()}</option>
                                 </#list>
@@ -50,12 +79,19 @@
                         </form>
                     </td>
                     <td><#list l.mentions() as m>@${m}<#sep>,</#list></td>
-                    <td>${l.status()}</td>
+                    <td <#if l.status() == "NEW">
+                        style="background-color: red"
+                        <#elseif l.status()  == "IN_PROGRESS" >
+                            style="background-color: blue"
+                        <#elseif l.status()  == "VALIDATION" >
+                            style="background-color: green"
+                    </#if>>
+                        ${l.status()}
+                    </td>
                     <td>${l.date()?string("HH:mm:ss dd/MM/yyyy")}</td>
-                    <td><a href="/moder/feedback/${l.id()}">open</a></td>
                 </tr>
             </#list>
-
+            </tbody>
         </table>
 
     </#if>
