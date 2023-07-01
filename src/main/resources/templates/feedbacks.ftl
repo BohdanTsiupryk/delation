@@ -5,45 +5,51 @@
 <@c.page>
     <#if role == "ADMIN" || role == "MODER">
 
+        <#if filterCurrentStatus??> <#assign currentStatus = filterCurrentStatus><#else><#assign currentStatus = ''> </#if>
+        <#if filterCurrentType??> <#assign currentType = filterCurrentType><#else><#assign currentType = ''> </#if>
+
         <div>
             <a href="/moder/feedback">clear filters</a>
         </div>
-        <div>
-            <form method="get" action="/moder/feedback">
-                <select name="type">
-                    <#list types as type>
-                        <option value="${type}">${type}</option>
-                    </#list>
-                </select>
-                <input type="submit" value="filter">
-            </form>
-        </div>
         <div class="mb-4">
             <h5>Filters</h5>
-            <form>
+            <form action="/moder/feedback" method="get">
                 <div class="form-row">
                     <div class="col">
                         <label for="categoryFilter">Category:</label>
-                        <select class="form-control" id="categoryFilter">
-                            <option value="">All</option>
-                            <option value="Bug">Bug</option>
-                            <option value="Suggestion">Suggestion</option>
-                            <option value="Enhancement">Enhancement</option>
-                        </select>
+                            <select name="type" class="form-control" id="categoryFilter">
+                                <option value="">---</option>
+                                <#list types as t>
+                                    <option <#if t == currentType>selected</#if>value="${t}">${t.getUa()}</option>
+                                </#list>
+                            </select>
                     </div>
                     <div class="col">
                         <label for="statusFilter">Status:</label>
-                        <select class="form-control" id="statusFilter">
-                            <option value="">All</option>
-                            <option value="Open">Open</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Closed">Closed</option>
-                        </select>
+                            <select name="status" class="form-control" id="statusFilter">
+                                <option value="">---</option>
+                                <#list statuses as s>
+                                    <option <#if s == currentStatus>selected</#if> value="${s}">${s}</option>
+                                </#list>
+                            </select>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary mt-2">Apply Filters</button>
             </form>
         </div>
+
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <#list listPageNumbers as numb>
+                    <li class="page-item <#if numb == currentPage>active</#if>">
+                        <a class="page-link" href="/moder/feedback?page=${numb}&type=${currentType}&status=${currentStatus}">${numb+1}</a>
+                    </li>
+                </#list>
+            </ul>
+        </nav>
+
+
         <table class="table table-striped">
             <thead>
 
@@ -62,7 +68,7 @@
             <#list list as l>
                 <tr>
                     <td title="${l.id()}"><a href="/moder/feedback/${l.id()}" target="_blank">${l.id()?substring(0, 8)}...</a></td>
-                    <td>${l.type()}</td>
+                    <td>${l.type().getUa()}</td>
                     <td class="text-limit" title="${l.text()}">${l.text()}</td>
                     <td>${l.author()}</td>
                     <td>
@@ -79,13 +85,7 @@
                         </form>
                     </td>
                     <td><#list l.mentions() as m>@${m}<#sep>,</#list></td>
-                    <td <#if l.status() == "NEW">
-                        style="background-color: red"
-                        <#elseif l.status()  == "IN_PROGRESS" >
-                            style="background-color: blue"
-                        <#elseif l.status()  == "VALIDATION" >
-                            style="background-color: green"
-                    </#if>>
+                    <td>
                         ${l.status()}
                     </td>
                     <td>${l.date()?string("HH:mm:ss dd/MM/yyyy")}</td>

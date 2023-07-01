@@ -21,6 +21,7 @@ public class FeedbackFlowService {
 
         if (currentStatus.equals(newStatus)) return;
 
+
         switch (newStatus) {
             case NEW -> {
             }
@@ -42,7 +43,21 @@ public class FeedbackFlowService {
                     historyService.changeStatus(feedback, moder, currentStatus, newStatus);
                 }
             }
+            case CANCELED -> {
+                moveInCanceled(feedbackId);
+                historyService.changeStatus(feedback, moder, currentStatus, newStatus);
+            }
         }
+    }
+
+    private void moveInCanceled(String taskId) {
+        Feedback feedback = feedbackService.getById(taskId);
+
+        discordNotificationService.notifyTaskStatusChanged(taskId, Status.CANCELED);
+
+        feedback.setStatus(Status.CANCELED);
+
+        feedbackService.save(feedback);
     }
 
     private void moveInProgress(String taskId) {

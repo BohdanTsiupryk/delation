@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -80,6 +81,7 @@ public class ProfileController {
         List<FeedbackProfileDto> delations = feedbackService.getByAuthor(byId.getId())
                 .stream()
                 .filter(f -> List.of(FeedbackType.APPEAL_MODER, FeedbackType.APPEAL, FeedbackType.BUG).contains(f.getType()))
+                .sorted(Comparator.comparing(f -> f.getStatus().priority()))
                 .map(f -> new FeedbackProfileDto(f.getId(), f.getType().getUa(), f.getStatus().name()))
                 .collect(Collectors.toList());
         model.addAttribute("delation", delations);

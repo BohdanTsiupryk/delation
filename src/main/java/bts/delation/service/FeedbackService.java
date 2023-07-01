@@ -4,9 +4,13 @@ import bts.delation.exception.NotFoundException;
 import bts.delation.model.DiscordUser;
 import bts.delation.model.Feedback;
 import bts.delation.model.User;
+import bts.delation.model.dto.FeedbackPage;
 import bts.delation.model.enums.FeedbackType;
+import bts.delation.model.enums.Status;
 import bts.delation.model.enums.UserRole;
 import bts.delation.repo.FeedbackRepo;
+import bts.delation.repo.FeedbackSearchService;
+import bts.delation.repo.dto.FeedbackSearchQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +24,7 @@ import java.util.Optional;
 public class FeedbackService {
 
     private final FeedbackRepo repo;
+    private final FeedbackSearchService feedbackSearchService;
     private final DiscordUserService discordUserService;
     private final UserService userService;
     private final HistoryService historyService;
@@ -30,14 +35,19 @@ public class FeedbackService {
         return repo.findAll();
     }
 
-    public List<Feedback> getAll(UserRole role, FeedbackType feedbackType) {
+    public FeedbackPage getAll(UserRole role, FeedbackSearchQuery query) {
 
-        List<Feedback> feedbacks = feedbackType == null ? repo.findAllNotDone() : repo.findAllByType(feedbackType);
-        return switch (role) {
+
+        List<Feedback> feedbacks = feedbackSearchService.searchByQuery(query);
+        long total = feedbackSearchService.countByQuery(query);
+
+        List<Feedback> result = switch (role) {
             case ADMIN -> feedbacks;
             case MODER -> feedbacks.stream().filter(feedback -> !feedback.getType().equals(FeedbackType.APPEAL_MODER)).toList();
             case CLIENT -> Collections.emptyList();
         };
+
+        return new FeedbackPage(result, query.page(), query.size(), total);
     }
 
     public Feedback addComment(String id, String comment, String email) {
@@ -64,7 +74,6 @@ public class FeedbackService {
 
     public void assignModer(String feedbackId, String moderId, String email) {
         Feedback feedback = getById(feedbackId);
-
         Optional<User> moder = Optional.ofNullable(feedback.getModer());
 
         if (isSameModer(moderId, moder) || isVitya(moderId, moder)) return;

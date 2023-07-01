@@ -2,11 +2,14 @@ package bts.delation.controller;
 
 import bts.delation.model.CustomOAuth2User;
 import bts.delation.model.Feedback;
+import bts.delation.model.dto.FeedbackPage;
 import bts.delation.model.enums.FeedbackType;
 import bts.delation.model.enums.Status;
 import bts.delation.model.dto.FeedbackDTO;
 import bts.delation.model.dto.HistoryRecordDTO;
 import bts.delation.model.dto.UserDTO;
+import bts.delation.repo.FeedbackSearchService;
+import bts.delation.repo.dto.FeedbackSearchQuery;
 import bts.delation.service.FeedbackFlowService;
 import bts.delation.service.FeedbackService;
 import bts.delation.service.HistoryService;
@@ -18,11 +21,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.ZoneOffset;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/moder/feedback")
@@ -37,25 +39,44 @@ public class FeedbackController {
     @GetMapping
     public String page(
             @AuthenticationPrincipal CustomOAuth2User user,
+            @RequestParam(required = false) Integer page,
             @RequestParam(required = false) String type,
+            @RequestParam(required = false) String status,
             Model model
     ) {
         FeedbackType feedbackType = parseType(type);
+        Status status1 = parseStatus(status);
+        Integer page1 = page == null ? 0 : page;
 
-        List<FeedbackDTO> all = feedbackService.getAll(user.getRole(), feedbackType)
+        FeedbackPage result = feedbackService.getAll(user.getRole(), new FeedbackSearchQuery(
+                feedbackType == null ? Collections.emptyList() : Collections.singletonList(feedbackType),
+                status1 == null ? Collections.emptyList() : Collections.singletonList(status1),
+                page1,
+                10
+        ));
+        List<FeedbackDTO> all = result
+                .feedbacks()
                 .stream()
                 .sorted(Comparator.comparing(Feedback::getCreatedAt).reversed())
                 .sorted(Comparator.comparing(feedback -> feedback.getStatus().priority()))
                 .map(this::mapToDto)
                 .toList();
+
         List<UserDTO> moders = userService.findModers()
                 .stream()
                 .map(u -> new UserDTO(u.getId(), u.getEmail()))
                 .toList();
 
-        model.addAttribute("list", all);
-        model.addAttribute("moders", moders);
-        model.addAttribute("types", FeedbackType.values());
+        model.addAttribute("list", all)
+                .addAttribute("moders", moders)
+                .addAttribute("types", FeedbackType.values())
+                .addAttribute("statuses", Status.values())
+                .addAttribute("currentPage", result.page())
+                .addAttribute("currentPageSize", result.size())
+                .addAttribute("currentTotal", result.total())
+                .addAttribute("listPageNumbers", IntStream.range(0, ((int) (result.total() / result.size())) + 1).toArray());
+
+        addCurrentFilterPosition(model, feedbackType, status1);
 
         return "feedbacks";
     }
@@ -141,10 +162,23 @@ public class FeedbackController {
         return "redirect:/moder/feedback";
     }
 
+    private void addCurrentFilterPosition(Model model, FeedbackType type, Status status) {
+
+        if (type != null) model.addAttribute("filterCurrentType", type);
+        if (status != null) model.addAttribute("filterCurrentStatus", status);
+    }
+
+    private static Status parseStatus(String s) {
+        Status status = null;
+        if (Objects.nonNull(s) && !s.equals("")) {
+            status = Status.valueOf(s);
+        }
+        return status;
+    }
 
     private static FeedbackType parseType(String type) {
         FeedbackType feedbackType = null;
-        if (Objects.nonNull(type)) {
+        if (Objects.nonNull(type) && !type.equals("")) {
             feedbackType = FeedbackType.valueOf(type);
         }
         return feedbackType;
@@ -158,7 +192,7 @@ public class FeedbackController {
                 feedback.getMentions(),
                 feedback.getText(),
                 feedback.getStatus().name(),
-                feedback.getType().getUa(),
+                feedback.getType(),
                 feedback.getAttachmentUrl(),
                 feedback.getReviewComment(),
                 Date.from(feedback.getCreatedAt().toInstant(ZoneOffset.UTC))
