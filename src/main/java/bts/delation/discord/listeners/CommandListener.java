@@ -22,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Component
@@ -134,12 +135,8 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
                 .filter(m -> mentionsIds.contains(m.getId().asString()))
                 .collectList()
                 .block()
-                .stream().peek(m -> {
-                    String toReplace = "<@" + m.getId().asString() + ">";
-                    int start = text.indexOf(toReplace);
-                    if (start == -1) return;
-                    text.replace(start, start + toReplace.length(), m.getUsername());
-                })
+                .stream()
+                .peek(replaceMembers(text))
                 .map(member -> member.getUsername())
                 .collect(Collectors.toSet());
 
@@ -153,5 +150,14 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
                 type,
                 LocalDateTime.now()
         ));
+    }
+
+    private static Consumer<Member> replaceMembers(StringBuilder text) {
+        return m -> {
+            String toReplace = "<@" + m.getId().asString() + ">";
+            int start = text.indexOf(toReplace);
+            if (start == -1) return;
+            text.replace(start, start + toReplace.length(), m.getUsername());
+        };
     }
 }

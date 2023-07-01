@@ -30,13 +30,7 @@ public class FeedbackService {
     private final HistoryService historyService;
 
 
-    public List<Feedback> getAll() {
-
-        return repo.findAll();
-    }
-
     public FeedbackPage getAll(UserRole role, FeedbackSearchQuery query) {
-
 
         List<Feedback> feedbacks = feedbackSearchService.searchByQuery(query);
         long total = feedbackSearchService.countByQuery(query);
@@ -57,22 +51,11 @@ public class FeedbackService {
 
         historyService.addComment(feedback, email, comment);
 
-        return repo.save(feedback);
-    }
-
-    public List<Feedback> getByAuthor(String id) {
-
-        DiscordUser user = discordUserService.getById(id);
-
-        return repo.findByAuthor(user);
-    }
-
-    public Feedback save(Feedback feedback) {
-
-        return repo.save(feedback);
+        return saveUpdate(feedback);
     }
 
     public void assignModer(String feedbackId, String moderId, String email) {
+
         Feedback feedback = getById(feedbackId);
         Optional<User> moder = Optional.ofNullable(feedback.getModer());
 
@@ -88,7 +71,38 @@ public class FeedbackService {
 
         historyService.assignedModer(feedback, email, Objects.isNull(feedback.getModer()) ? "none" : feedback.getModer().getEmail(), moderId);
 
-        repo.save(feedback);
+        saveUpdate(feedback);
+    }
+
+    public List<Feedback> getAll() {
+
+        return repo.findAll();
+    }
+
+    public List<Feedback> getByAuthor(String id) {
+
+        DiscordUser user = discordUserService.getById(id);
+
+        return repo.findByAuthor(user);
+    }
+
+    public Feedback save(Feedback feedback) {
+
+        handleByType(feedback);
+
+        return repo.save(feedback);
+    }
+
+    public Feedback saveUpdate(Feedback feedback) {
+
+        return repo.save(feedback);
+    }
+
+    private static void handleByType(Feedback feedback) {
+        switch (feedback.getType()) {
+            case FEEDBACK -> feedback.setStatus(Status.VALIDATION);
+            default -> {}
+        }
     }
 
     private static boolean isVitya(String moderId, Optional<User> moder) {

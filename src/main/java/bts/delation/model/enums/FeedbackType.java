@@ -9,6 +9,7 @@ public enum FeedbackType {
     FEEDBACK("feedback", "ВІДГУК"),
     APPEAL("appeal", "СКАРГА"),
     APPEAL_MODER("appeal_moder", "СКАРГА НА МОДЕРА"),
+    OFFER("offer", "ПРОПОЗИЦІЯ"),
     BUG("bug", "БАГ");
 
     private final String value;

@@ -57,7 +57,7 @@ public class FeedbackFlowService {
 
         feedback.setStatus(Status.CANCELED);
 
-        feedbackService.save(feedback);
+        feedbackService.saveUpdate(feedback);
     }
 
     private void moveInProgress(String taskId) {
@@ -67,7 +67,7 @@ public class FeedbackFlowService {
 
         feedback.setStatus(Status.IN_PROGRESS);
 
-        feedbackService.save(feedback);
+        feedbackService.saveUpdate(feedback);
     }
 
 
@@ -78,7 +78,7 @@ public class FeedbackFlowService {
 
         feedback.setStatus(Status.DONE);
 
-        feedbackService.save(feedback);
+        feedbackService.saveUpdate(feedback);
     }
 
     private void moveToValidation(String taskId) {
@@ -88,6 +88,6 @@ public class FeedbackFlowService {
 
         feedback.setStatus(Status.VALIDATION);
 
-        feedbackService.save(feedback);
+        feedbackService.saveUpdate(feedback);
     }
 }
