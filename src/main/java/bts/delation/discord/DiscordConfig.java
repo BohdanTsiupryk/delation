@@ -8,6 +8,7 @@ import discord4j.core.event.domain.Event;
 import discord4j.core.object.command.ApplicationCommandOption;
 import discord4j.discordjson.json.*;
 import discord4j.gateway.intent.IntentSet;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,9 +20,12 @@ import java.util.stream.Collectors;
 public class DiscordConfig {
 
     @Bean
-    public <T extends Event> GatewayDiscordClient gatewayDiscordClient(List<DiscordEventListener<T>> listeners) {
+    public <T extends Event> GatewayDiscordClient gatewayDiscordClient(
+            List<DiscordEventListener<T>> listeners,
+            @Value("${discord.key}") String discordKey
+    ) {
         GatewayDiscordClient client = DiscordClientBuilder
-                .create("MTEwNjIzNTQwMjA4MTI4ODIxMg.GO3dgn.aDSLkgZTdOgmP65ejVmLlyO5weSVMuC6jUDPRU")
+                .create(discordKey)
                 .build()
                 .gateway()
                 .setEnabledIntents(IntentSet.all())
@@ -29,7 +33,26 @@ public class DiscordConfig {
 
         Long appId = client.getRestClient().getApplicationId().block();
 
-        ApplicationCommandRequest feedbackCommand = ApplicationCommandRequest.builder()
+        ApplicationCommandRequest feedbackCommand = createFeedbackCommand();
+        ApplicationCommandRequest statusCommand = createStatusCommand();
+        ImmutableApplicationCommandRequest syncCommand = createSyncCommand();
+
+        client.getRestClient().getApplicationService()
+                .bulkOverwriteGlobalApplicationCommand(appId, List.of(feedbackCommand, statusCommand, syncCommand))
+                .subscribe();
+
+        listeners.forEach(listener -> {
+            client.on(listener.getEventType())
+                    .flatMap(listener::execute)
+                    .onErrorResume(listener::handleError)
+                    .subscribe();
+        });
+
+        return client;
+    }
+
+    private static ImmutableApplicationCommandRequest createFeedbackCommand() {
+        return ApplicationCommandRequest.builder()
                 .name("feedback")
                 .description("Send feedback")
                 .addOption(optionFeedbackType())
@@ -46,13 +69,17 @@ public class DiscordConfig {
                         .required(false)
                         .build())
                 .build();
+    }
 
-        ApplicationCommandRequest statusCommand = ApplicationCommandRequest.builder()
+    private static ImmutableApplicationCommandRequest createStatusCommand() {
+        return ApplicationCommandRequest.builder()
                 .name("status")
                 .description("Check feedback statuses")
                 .build();
+    }
 
-        ImmutableApplicationCommandRequest syncCommand = ApplicationCommandRequest.builder()
+    private static ImmutableApplicationCommandRequest createSyncCommand() {
+        return ApplicationCommandRequest.builder()
                 .name("sync")
                 .description("Sync acc with discord")
                 .addOption(ApplicationCommandOptionData.builder()
@@ -62,24 +89,6 @@ public class DiscordConfig {
                         .required(true)
                         .build())
                 .build();
-
-        client.getRestClient().getApplicationService()
-                .bulkOverwriteGuildApplicationCommand(appId, 1106357010334744697L, List.of(feedbackCommand, statusCommand))
-                .subscribe();
-
-        client.getRestClient()
-                .getApplicationService()
-                .createGlobalApplicationCommand(appId, syncCommand)
-                .subscribe();
-
-        listeners.forEach(listener -> {
-            client.on(listener.getEventType())
-                    .flatMap(listener::execute)
-                    .onErrorResume(listener::handleError)
-                    .subscribe();
-        });
-
-        return client;
     }
 
     private static ImmutableApplicationCommandOptionData optionFeedbackType() {

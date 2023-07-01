@@ -148,7 +148,8 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
                 Status.NEW,
                 url,
                 type,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                event.getInteraction().getGuildId().get().asString()
         ));
     }
 

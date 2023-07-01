@@ -50,6 +50,8 @@ public class Feedback {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
+    private String guildId;
+
     public Feedback(String id,
                     DiscordUser author,
                     Set<String> mentions,
@@ -57,7 +59,8 @@ public class Feedback {
                     Status status,
                     String attachmentUrl,
                     FeedbackType type,
-                    LocalDateTime createdAt) {
+                    LocalDateTime createdAt,
+                    String guildId) {
         this.id = id;
         this.author = author;
         this.mentions = mentions;
@@ -66,5 +69,6 @@ public class Feedback {
         this.attachmentUrl = attachmentUrl;
         this.type = type;
         this.createdAt = createdAt;
+        this.guildId = guildId;
     }
 }

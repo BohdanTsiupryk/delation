@@ -36,18 +36,5 @@ spring:
               - openid
               - email
               - profile
-#          discord:
-#            client-id: 1106235402081288212
-#            client-secret: nMTJyz5dMhvU5-UDAmdWOXJYO3AlU4Dt
-#            client-authentication-method: post
-#            scope:
-#              - identify
-#              - email
-#            redirect-uri: "{baseUrl}/login/oauth2/code/discord"
-#            client-name: test
-#        provider:
-#          discord:
-#            authorization-uri: https://discordapp.com/api/oauth2/authorize
-#            token-uri: https://discordapp.com/api/oauth2/token
-#            user-info-uri: https://discordapp.com/api/users/@me
-#            user-name-attribute: username
+discord:
+  key: "MTEwNjIzNTQwMjA4MTI4ODIxMg.GO3dgn.aDSLkgZTdOgmP65ejVmLlyO5weSVMuC6jUDPRU"
