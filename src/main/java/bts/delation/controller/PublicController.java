@@ -26,6 +26,7 @@ public class PublicController {
 
         PublicFeedbackDto publicFeedbackDto = Optional.ofNullable(feedbackService.getById(id))
                 .map(f -> new PublicFeedbackDto(
+                        f.getId().toString(),
                         f.getStatus().name(),
                         Date.from(f.getCreatedAt().toInstant(ZoneOffset.UTC)),
                         Objects.nonNull(f.getModer()) ? f.getModer().getUsername() : "",
@@ -43,6 +44,7 @@ public class PublicController {
     }
 
     public record PublicFeedbackDto(
+            String id,
             String status,
             Date date,
             String moder,

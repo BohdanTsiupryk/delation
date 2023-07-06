@@ -3,10 +3,10 @@
 <#assign isAdmin = false>
 <#assign isModer = false>
 
-<#if isAuth>
-    <#assign role = principal.role>
-    <#if principal.role == "ADMIN"> <#assign isAdmin = true></#if>
-    <#if principal.role == "MODER"> <#assign isModer = true></#if>
+<#if isAuth && principal != "anonymousUser">
+        <#assign role = principal.role>
+        <#if principal.role == "ADMIN"> <#assign isAdmin = true></#if>
+        <#if principal.role == "MODER"> <#assign isModer = true></#if>
 <#else>
     <#assign role = "UNKNOWN">
 </#if>

@@ -6,14 +6,11 @@
     <#if role == "ADMIN" || role == "MODER">
 
         <div class="container">
-            <h1>Single Feedback</h1>
-
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">Feedback Title</h5>
+                    <h5 class="mb-0">${feedback.id()}</h5>
                 </div>
                 <div class="card-body">
-                    <p class="card-text"><strong>ID:</strong> ${feedback.id()}</p>
                     <p class="card-text"><strong>Created At:</strong> ${feedback.date()?string("HH:mm:ss dd/MM/yyyy")}</p>
                     <p class="card-text"><strong>Status:</strong> <form method="post" action="/moder/feedback/move">
                         <select name="status">

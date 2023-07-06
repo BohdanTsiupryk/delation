@@ -24,13 +24,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
          if (Objects.nonNull(modelAndView)) {
              SecurityContext context = SecurityContextHolder.getContext();
 
-             if (context.getAuthentication().isAuthenticated()) {
-                 return;
-             }
-
-             CustomOAuth2User principal = (CustomOAuth2User) context.getAuthentication().getPrincipal();
-
-             modelAndView.addObject("principal", principal);
+             modelAndView.addObject("principal", context.getAuthentication().getPrincipal());
          }
     }
 }
