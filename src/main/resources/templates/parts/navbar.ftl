@@ -12,7 +12,10 @@
                     <a class="nav-link" href="/profile">Profile</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/moder/feedback">Feedback List</a>
+                    <a class="nav-link" href="/moder/feedback">Appeal</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/moder/feedback/client">Feedback List</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/admin">Admin Page</a>

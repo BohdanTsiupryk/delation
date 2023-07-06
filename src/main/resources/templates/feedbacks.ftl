@@ -67,7 +67,7 @@
             <tbody>
             <#list list as l>
                 <tr>
-                    <td title="${l.id()}"><a href="/moder/feedback/${l.id()}" target="_blank">${l.id()?substring(0, 8)}...</a></td>
+                    <td title="${l.id()}"><a href="/moder/feedback/${l.id()}" target="_blank">${l.id()}</a></td>
                     <td>${l.type().getUa()}</td>
                     <td class="text-limit" title="${l.text()}">${l.text()}</td>
                     <td>${l.author()}</td>

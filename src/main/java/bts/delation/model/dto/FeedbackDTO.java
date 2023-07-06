@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Set;
 
 public record FeedbackDTO(
-       String id,
+       Long id,
        String author,
        String moder,
        Set<String> mentions,

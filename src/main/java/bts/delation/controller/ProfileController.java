@@ -88,7 +88,7 @@ public class ProfileController {
     }
 
     public record FeedbackProfileDto(
-            String id,
+            Long id,
             String type,
             String status
     ) {}

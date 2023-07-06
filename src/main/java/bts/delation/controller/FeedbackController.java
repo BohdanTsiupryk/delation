@@ -46,12 +46,12 @@ public class FeedbackController {
     ) {
         FeedbackType feedbackType = parseType(type);
         Status status1 = parseStatus(status);
-        Integer page1 = page == null ? 0 : page;
+        Integer parsedPage = page == null ? 0 : page;
 
         FeedbackPage result = feedbackService.getAll(user.getRole(), new FeedbackSearchQuery(
                 feedbackType == null ? Collections.emptyList() : Collections.singletonList(feedbackType),
                 status1 == null ? Collections.emptyList() : Collections.singletonList(status1),
-                page1,
+                parsedPage,
                 10
         ));
         List<FeedbackDTO> all = result
@@ -79,6 +79,37 @@ public class FeedbackController {
         addCurrentFilterPosition(model, feedbackType, status1);
 
         return "feedbacks";
+    }
+
+    @GetMapping("/client")
+    public String clientPage(
+            @AuthenticationPrincipal CustomOAuth2User user,
+            @RequestParam(required = false) Integer page,
+            Model model
+    ) {
+        Integer parsedPage = page == null ? 0 : page;
+
+        FeedbackPage result = feedbackService.getAll(user.getRole(), new FeedbackSearchQuery(
+                Collections.singletonList(FeedbackType.FEEDBACK),
+                Collections.singletonList(Status.DONE),
+                parsedPage,
+                10
+        ));
+        List<FeedbackDTO> all = result
+                .feedbacks()
+                .stream()
+                .sorted(Comparator.comparing(Feedback::getCreatedAt).reversed())
+                .sorted(Comparator.comparing(feedback -> feedback.getStatus().priority()))
+                .map(this::mapToDto)
+                .toList();
+
+        model.addAttribute("feedbacks", all)
+                .addAttribute("currentPage", result.page())
+                .addAttribute("currentPageSize", result.size())
+                .addAttribute("currentTotal", result.total())
+                .addAttribute("listPageNumbers", IntStream.range(0, ((int) (result.total() / result.size())) + 1).toArray());
+
+        return "client-feedbacks";
     }
 
     @GetMapping("/{id}")

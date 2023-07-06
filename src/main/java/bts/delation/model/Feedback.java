@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -18,7 +19,8 @@ import java.util.Set;
 public class Feedback {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
@@ -52,8 +54,7 @@ public class Feedback {
 
     private String guildId;
 
-    public Feedback(String id,
-                    DiscordUser author,
+    public Feedback(DiscordUser author,
                     Set<String> mentions,
                     String text,
                     Status status,
@@ -61,7 +62,6 @@ public class Feedback {
                     FeedbackType type,
                     LocalDateTime createdAt,
                     String guildId) {
-        this.id = id;
         this.author = author;
         this.mentions = mentions;
         this.text = text;
@@ -70,5 +70,14 @@ public class Feedback {
         this.type = type;
         this.createdAt = createdAt;
         this.guildId = guildId;
+    }
+
+    public boolean isModerAssigned() {
+        return Objects.nonNull(moder);
+    }
+
+    public boolean isCommentAdded() {
+        return Objects.nonNull(reviewComment)
+                && !reviewComment.trim().equals("");
     }
 }

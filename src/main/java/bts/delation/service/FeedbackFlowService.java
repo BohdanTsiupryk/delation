@@ -5,6 +5,8 @@ import bts.delation.model.enums.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class FeedbackFlowService {
@@ -26,10 +28,8 @@ public class FeedbackFlowService {
             case NEW -> {
             }
             case IN_PROGRESS -> {
-                if (currentStatus.equals(Status.NEW) || currentStatus.equals(Status.VALIDATION)) {
-                    moveInProgress(feedbackId);
-                    historyService.changeStatus(feedback, moder, currentStatus, newStatus);
-                }
+                moveInProgress(feedbackId);
+                historyService.changeStatus(feedback, moder, currentStatus, newStatus);
             }
             case VALIDATION -> {
                 if (currentStatus.equals(Status.IN_PROGRESS)) {
@@ -39,8 +39,10 @@ public class FeedbackFlowService {
             }
             case DONE -> {
                 if (currentStatus.equals(Status.VALIDATION)) {
-                    moveToDone(feedbackId);
-                    historyService.changeStatus(feedback, moder, currentStatus, newStatus);
+                    if (isReadyToDone(feedback)) {
+                        moveToDone(feedbackId);
+                        historyService.changeStatus(feedback, moder, currentStatus, newStatus);
+                    }
                 }
             }
             case CANCELED -> {
@@ -48,6 +50,11 @@ public class FeedbackFlowService {
                 historyService.changeStatus(feedback, moder, currentStatus, newStatus);
             }
         }
+    }
+
+    private boolean isReadyToDone(Feedback feedback) {
+        return feedback.isCommentAdded()
+                && feedback.isModerAssigned();
     }
 
     private void moveInCanceled(String taskId) {

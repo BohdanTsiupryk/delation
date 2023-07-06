@@ -141,7 +141,6 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
                 .collect(Collectors.toSet());
 
         return feedbackService.save(new Feedback(
-                UUID.randomUUID().toString(),
                 discordAuthor,
                 mentions,
                 text.toString(),
