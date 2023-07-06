@@ -38,3 +38,6 @@ spring:
               - profile
 discord:
   key: "MTEwNjIzNTQwMjA4MTI4ODIxMg.GO3dgn.aDSLkgZTdOgmP65ejVmLlyO5weSVMuC6jUDPRU"
+
+host:
+  base-url: "http://localhost:9999"

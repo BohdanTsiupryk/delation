@@ -35,10 +35,14 @@ public class DiscordConfig {
 
         ApplicationCommandRequest feedbackCommand = createFeedbackCommand();
         ApplicationCommandRequest statusCommand = createStatusCommand();
+        ApplicationCommandRequest helpCommand = createHelpCommand();
         ImmutableApplicationCommandRequest syncCommand = createSyncCommand();
 
         client.getRestClient().getApplicationService()
-                .bulkOverwriteGlobalApplicationCommand(appId, List.of(feedbackCommand, statusCommand, syncCommand))
+                .bulkOverwriteGlobalApplicationCommand(
+                        appId,
+                        List.of(feedbackCommand, statusCommand, syncCommand, helpCommand)
+                )
                 .subscribe();
 
         listeners.forEach(listener -> {
@@ -54,37 +58,44 @@ public class DiscordConfig {
     private static ImmutableApplicationCommandRequest createFeedbackCommand() {
         return ApplicationCommandRequest.builder()
                 .name("feedback")
-                .description("Send feedback")
+                .description("Надіслати відгук")
                 .addOption(optionFeedbackType())
                 .addOption(ApplicationCommandOptionData.builder()
                         .name("value")
-                        .description("ваш відгук/скарга")
+                        .description("Тут натикайте, що думаєте")
                         .type(ApplicationCommandOption.Type.STRING.getValue())
                         .required(true)
                         .build())
                 .addOption(ApplicationCommandOptionData.builder()
                         .name("attachment")
-                        .description("додатки")
+                        .description("Тут виберіть фото з вашим доказом (необов'язково)")
                         .type(ApplicationCommandOption.Type.ATTACHMENT.getValue())
                         .required(false)
                         .build())
                 .build();
     }
 
+    private static ImmutableApplicationCommandRequest createHelpCommand() {
+        return ApplicationCommandRequest.builder()
+                .name("help")
+                .description("Допомога")
+                .build();
+    }
+
     private static ImmutableApplicationCommandRequest createStatusCommand() {
         return ApplicationCommandRequest.builder()
                 .name("status")
-                .description("Check feedback statuses")
+                .description("Перевірити чи на ваш відгук нам не начхати")
                 .build();
     }
 
     private static ImmutableApplicationCommandRequest createSyncCommand() {
         return ApplicationCommandRequest.builder()
                 .name("sync")
-                .description("Sync acc with discord")
+                .description("Синхронізувати аккаунт з діскордом")
                 .addOption(ApplicationCommandOptionData.builder()
                         .name("code")
-                        .description("Your code")
+                        .description("Ваш код")
                         .type(ApplicationCommandOption.Type.STRING.getValue())
                         .required(true)
                         .build())
@@ -103,7 +114,7 @@ public class DiscordConfig {
 
         return ApplicationCommandOptionData.builder()
                 .name("type")
-                .description("feedback type")
+                .description("Тип відгуку, правильність вказання, зменшує час на її розгляд")
                 .type(ApplicationCommandOption.Type.STRING.getValue())
                 .addAllChoices(collect)
                 .required(true)

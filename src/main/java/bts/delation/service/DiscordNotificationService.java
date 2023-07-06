@@ -35,7 +35,7 @@ public class DiscordNotificationService {
                 ).subscribe();
     }
 
-    public void notifyTaskStatusChanged(String feedbackId, Status newStatus) {
+    public void notifyTaskStatusChanged(Long feedbackId, Status newStatus) {
         Feedback feedback = feedbackService.getById(feedbackId);
 
         notifyAdmins(feedback.getGuildId(), String.format("Task %s was updated: %s", feedback.getId(), newStatus));

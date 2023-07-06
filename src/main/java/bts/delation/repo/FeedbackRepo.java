@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface FeedbackRepo extends JpaRepository<Feedback, String>, JpaSpecificationExecutor<Feedback> {
+public interface FeedbackRepo extends JpaRepository<Feedback, Long>, JpaSpecificationExecutor<Feedback> {
 
     List<Feedback> findByAuthor(DiscordUser user);
 

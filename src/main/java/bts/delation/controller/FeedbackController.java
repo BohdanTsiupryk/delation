@@ -113,7 +113,7 @@ public class FeedbackController {
     }
 
     @GetMapping("/{id}")
-    public String page(@PathVariable String id, Model model) {
+    public String page(@PathVariable Long id, Model model) {
 
         Feedback feedback = feedbackService.getById(id);
         FeedbackDTO feedbackDTO = mapToDto(feedback);
@@ -146,7 +146,7 @@ public class FeedbackController {
     }
 
     @PostMapping("/add-comment")
-    public String addComment(@RequestParam String id,
+    public String addComment(@RequestParam Long id,
                              @RequestParam String comment,
                              @AuthenticationPrincipal CustomOAuth2User user,
                              Model model) {
@@ -161,7 +161,7 @@ public class FeedbackController {
     }
 
     @PostMapping("/move")
-    public String moveTo(@RequestParam String id,
+    public String moveTo(@RequestParam Long id,
                          @RequestParam String status,
                          @AuthenticationPrincipal CustomOAuth2User user,
                          Model model) {
@@ -178,7 +178,7 @@ public class FeedbackController {
     @PostMapping("/assign")
     public String assign(
             @RequestParam String moder,
-            @RequestParam String id,
+            @RequestParam Long id,
             @RequestParam String from,
             @AuthenticationPrincipal CustomOAuth2User user,
             Model model

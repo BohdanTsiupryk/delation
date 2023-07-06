@@ -12,11 +12,14 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteraction;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.component.ActionComponent;
 import discord4j.core.object.component.ActionRow;
 import discord4j.core.object.component.Button;
 import discord4j.core.object.entity.Member;
 import discord4j.core.spec.InteractionApplicationCommandCallbackSpec;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -34,6 +37,9 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
     private final UserService userService;
     private final HistoryService historyService;
     private final SyncService syncService;
+
+    @Value("${host.base-url}")
+    private String baseHostUrl;
 
     @Override
     public Class<ApplicationCommandInteractionEvent> getEventType() {
@@ -53,11 +59,35 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
                     .build());
         }
 
-        if (event.getCommandName().equals("feedback")) return processFeedback(event, member);
-        if (event.getCommandName().equals("status")) return processStatus(event, member);
-        if (event.getCommandName().equals("sync")) return processSync(event, member);
+        return switch (event.getCommandName()) {
+            case "feedback" -> processFeedback(event, member);
+            case "status" -> processStatus(event, member);
+            case "sync" -> processSync(event, member);
+            case "help" -> processHelp(event);
+            default -> Mono.empty();
+        };
+    }
 
-        return Mono.empty();
+    private Mono<Void> processStatus(ApplicationCommandInteractionEvent event, Member member) {
+
+        List<Feedback> feedbacks = feedbackService.getByAuthor(member.getId().asString());
+
+
+        StringBuilder sb = new StringBuilder(ResponseTemplate.STATUS_TASK_LIST);
+        feedbacks.forEach(f -> sb.append("[")
+                .append(f.getId())
+                .append("]")
+                .append("(")
+                .append(publicFeedbackUrl(f.getId().toString()))
+                .append(")")
+                .append(" | ")
+                .append(f.getStatus())
+                .append(" | ")
+                .append(trimStatusText(f.getText()))
+                .append("\n")
+        );
+
+        return event.reply(sb.toString());
     }
 
     private Mono<Void> processSync(ApplicationCommandInteractionEvent event, Member member) {
@@ -76,16 +106,6 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
         return event.reply("OK");
     }
 
-    private Mono<Void> processStatus(ApplicationCommandInteractionEvent event, Member member) {
-
-        List<Feedback> feedbacks = feedbackService.getByAuthor(member.getId().asString());
-
-        StringBuilder sb = new StringBuilder();
-        feedbacks.forEach(f -> sb.append(f.getId()).append("|").append(f.getStatus()).append("|").append(f.getText()).append("\n"));
-
-        return event.reply(String.format("Task list: \n %s", sb));
-    }
-
     private Mono<Void> processFeedback(ApplicationCommandInteractionEvent event, Member member) {
 
         String author = member.getUsername();
@@ -98,7 +118,7 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
 
         historyService.taskCreated(feedback, author);
 
-        return event.reply(String.format("%s прийнято, дякуємо що робите нас кращими \n |%s|", feedback.getType().getUa(), feedback.getText()));
+        return event.reply(String.format(ResponseTemplate.FEEDBACK_RESPONSE, feedback.getType().getUa(), publicFeedbackUrl(feedback.getId().toString())));
     }
 
     private String getAttachment(Optional<ApplicationCommandInteraction> commandInteraction, String attachment) {
@@ -150,6 +170,18 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
                 LocalDateTime.now(),
                 event.getInteraction().getGuildId().get().asString()
         ));
+    }
+
+    private String publicFeedbackUrl(String id) {
+        return baseHostUrl + "/public/feedback/" + id;
+    }
+
+    private static String trimStatusText(String text) {
+        return text.length() > 32 ? text.substring(0, 30) : text;
+    }
+
+    private Mono<Void> processHelp(ApplicationCommandInteractionEvent event) {
+        return event.reply(ResponseTemplate.HELP);
     }
 
     private static Consumer<Member> replaceMembers(StringBuilder text) {

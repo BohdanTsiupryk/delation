@@ -23,6 +23,11 @@ public class SecurityInterceptor implements HandlerInterceptor {
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
          if (Objects.nonNull(modelAndView)) {
              SecurityContext context = SecurityContextHolder.getContext();
+
+             if (context.getAuthentication().isAuthenticated()) {
+                 return;
+             }
+
              CustomOAuth2User principal = (CustomOAuth2User) context.getAuthentication().getPrincipal();
 
              modelAndView.addObject("principal", principal);

@@ -44,7 +44,7 @@ public class FeedbackService {
         return new FeedbackPage(result, query.page(), query.size(), total);
     }
 
-    public Feedback addComment(String id, String comment, String email) {
+    public Feedback addComment(Long id, String comment, String email) {
 
         Feedback feedback = getById(id);
         feedback.setReviewComment(comment);
@@ -54,7 +54,7 @@ public class FeedbackService {
         return saveUpdate(feedback);
     }
 
-    public void assignModer(String feedbackId, String moderId, String email) {
+    public void assignModer(Long feedbackId, String moderId, String email) {
 
         Feedback feedback = getById(feedbackId);
         Optional<User> moder = Optional.ofNullable(feedback.getModer());
@@ -113,7 +113,7 @@ public class FeedbackService {
         return moder.isPresent() && moder.get().getId().equals(moderId);
     }
 
-    public Feedback getById(String taskId) {
+    public Feedback getById(Long taskId) {
         return repo.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Feedback not found"));
     }

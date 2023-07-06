@@ -16,7 +16,7 @@ public class FeedbackFlowService {
     private final HistoryService historyService;
 
 
-    public void manageStatusFlow(String feedbackId, Status newStatus, String moder) {
+    public void manageStatusFlow(Long feedbackId, Status newStatus, String moder) {
 
         Feedback feedback = feedbackService.getById(feedbackId);
         Status currentStatus = feedback.getStatus();
@@ -57,7 +57,7 @@ public class FeedbackFlowService {
                 && feedback.isModerAssigned();
     }
 
-    private void moveInCanceled(String taskId) {
+    private void moveInCanceled(Long taskId) {
         Feedback feedback = feedbackService.getById(taskId);
 
         discordNotificationService.notifyTaskStatusChanged(taskId, Status.CANCELED);
@@ -67,7 +67,7 @@ public class FeedbackFlowService {
         feedbackService.saveUpdate(feedback);
     }
 
-    private void moveInProgress(String taskId) {
+    private void moveInProgress(Long taskId) {
         Feedback feedback = feedbackService.getById(taskId);
 
         discordNotificationService.notifyTaskStatusChanged(taskId, Status.IN_PROGRESS);
@@ -78,7 +78,7 @@ public class FeedbackFlowService {
     }
 
 
-    private void moveToDone(String taskId) {
+    private void moveToDone(Long taskId) {
         Feedback feedback = feedbackService.getById(taskId);
 
         discordNotificationService.notifyTaskStatusChanged(taskId, Status.DONE);
@@ -88,7 +88,7 @@ public class FeedbackFlowService {
         feedbackService.saveUpdate(feedback);
     }
 
-    private void moveToValidation(String taskId) {
+    private void moveToValidation(Long taskId) {
         Feedback feedback = feedbackService.getById(taskId);
 
         discordNotificationService.notifyTaskStatusChanged(taskId, Status.VALIDATION);
