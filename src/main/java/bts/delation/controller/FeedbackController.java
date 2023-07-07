@@ -152,7 +152,7 @@ public class FeedbackController {
                              Model model) {
 
         if (!user.isAdmin() && !user.isModer()) {
-            return "redirect:/index";
+            return "redirect:/404";
         }
 
         feedbackService.addComment(id, comment, user.getEmail());
@@ -167,7 +167,7 @@ public class FeedbackController {
                          Model model) {
 
         if (!user.isAdmin() && !user.isModer()) {
-            return "redirect:/index";
+            return "redirect:/404";
         }
 
         feedbackFlowService.manageStatusFlow(id, Status.valueOf(status), user.getEmail());

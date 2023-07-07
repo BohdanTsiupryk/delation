@@ -1,14 +1,15 @@
 package bts.delation.controller;
 
+import bts.delation.exception.NotFoundException;
 import bts.delation.service.FeedbackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Objects;
@@ -24,7 +25,7 @@ public class PublicController {
     @GetMapping("/feedback/{id}")
     public String feedbackPublicView(@PathVariable Long id, Model model) {
 
-        PublicFeedbackDto publicFeedbackDto = Optional.ofNullable(feedbackService.getById(id))
+        Optional<PublicFeedbackDto> optionalPublicFeedbackDto = Optional.ofNullable(feedbackService.getById(id))
                 .map(f -> new PublicFeedbackDto(
                         f.getId().toString(),
                         f.getStatus().name(),
@@ -35,12 +36,19 @@ public class PublicController {
                         f.getAuthor().getDiscordUsername(),
                         f.getReviewComment(),
                         f.getAttachmentUrl()
-                ))
-                .get();
+                ));
 
-        model.addAttribute("feedback",publicFeedbackDto);
+        if (optionalPublicFeedbackDto.isEmpty()) return "redirect:/404";
+
+        model.addAttribute("feedback", optionalPublicFeedbackDto.get());
 
         return "public-feedback";
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public String handleNotFound(NotFoundException e, Model model) {
+
+        return "redirect:/error/404";
     }
 
     public record PublicFeedbackDto(
