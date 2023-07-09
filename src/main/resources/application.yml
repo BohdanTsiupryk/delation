@@ -19,7 +19,7 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/bu}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto:  update
 
   security:
     user:

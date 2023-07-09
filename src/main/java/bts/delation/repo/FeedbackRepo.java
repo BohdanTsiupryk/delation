@@ -15,12 +15,4 @@ import java.util.List;
 public interface FeedbackRepo extends JpaRepository<Feedback, Long>, JpaSpecificationExecutor<Feedback> {
 
     List<Feedback> findByAuthor(DiscordUser user);
-
-    List<Feedback> findAllByTypeNotIn(List<FeedbackType> type);
-
-    @Query(value = "from Feedback f where f.status != 'DONE' and f.status != 'CANCELED'")
-    List<Feedback> findAllNotDone();
-
-    @Query(value = "from Feedback f where f.type = :type")
-    List<Feedback> findAllByType(@Param("type") FeedbackType type);
 }

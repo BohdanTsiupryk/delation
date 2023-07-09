@@ -1,8 +1,11 @@
 package bts.delation.controller;
 
 import bts.delation.model.CustomOAuth2User;
+import bts.delation.model.DiscordUser;
 import bts.delation.model.User;
 import bts.delation.model.enums.UserRole;
+import bts.delation.service.DiscordService;
+import bts.delation.service.DiscordUserService;
 import bts.delation.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,15 +24,27 @@ import java.util.List;
 public class AdminController {
 
     private final UserService userService;
+    private final DiscordService discordService;
+    private final DiscordUserService discordUserService;
 
     @GetMapping
     public String adminPage(Model model) {
 
         List<User> users = userService.getUsers();
+        List<DiscordUser> discordUsers = discordUserService.findAllUsers();
 
         model.addAttribute("users", users);
+        model.addAttribute("discordUsers", discordUsers);
         model.addAttribute("roles", UserRole.values());
         return "admin-page";
+    }
+
+    @GetMapping("/guild/sync")
+    public String syncGuild() {
+
+        discordService.saveUsersToDb("1106357010334744697");
+
+        return "redirect:/admin";
     }
 
     @PostMapping("/change-role")

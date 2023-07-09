@@ -6,15 +6,15 @@
 
     <#if role == "ADMIN">
         <table class="table-container">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
             <#list users as usr>
                 <tr>
                     <td><a href="/profile?id=${usr.id}">${usr.id}</a></td>
@@ -34,7 +34,34 @@
 
                 </tr>
             </#list>
-        </tbody>
+            </tbody>
+        </table>
+        <br>
+        <br>
+        <br>
+        <table class="table-container">
+
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>username</th>
+                <th>minecraft name</th>
+                <th>user on site</th>
+            </tr>
+            </thead>
+            <tbody>
+            <#list discordUsers as usr>
+                <tr>
+                    <td>${usr.id}</td>
+                    <td>${usr.discordUsername}</td>
+                    <td><#if usr.mineUsername??>${usr.mineUsername}<#else>-</#if></td>
+                    <td>
+                        <#if usr.user??>+<#else>-</#if>
+                    </td>
+
+                </tr>
+            </#list>
+            </tbody>
         </table>
 
     <#else>

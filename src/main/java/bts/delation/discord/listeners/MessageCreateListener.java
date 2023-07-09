@@ -8,13 +8,14 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.component.Button;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
+import discord4j.core.spec.MessageCreateSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
-@Service
+//@Service
 @RequiredArgsConstructor
 public class MessageCreateListener extends MessageListener implements DiscordEventListener<MessageCreateEvent> {
 
@@ -33,44 +34,14 @@ public class MessageCreateListener extends MessageListener implements DiscordEve
     public Mono<Void> execute(MessageCreateEvent event) {
 
         Message message = event.getMessage();
-        Optional<User> author = message.getAuthor();
-        String content = message.getContent();
-
-        if (!content.startsWith(prefix)) return Mono.empty();
-        if (author.isEmpty() || author.get().isBot()) return Mono.empty();
-        if (!isDiscordMineSync(author.get())) {
-            return processUnlinkedAccount(message);
+        if (message.getContent().equalsIgnoreCase("дякую")) {
+            event.getMember().get().getPrivateChannel()
+                    .flatMap(c -> c.createMessage(MessageCreateSpec.builder()
+                            .content("Догори сракою =)")
+                            .build()))
+                    .subscribe();
         }
-
-        String command = content.contains(" ") ? content.substring(0, content.indexOf(" ")) : content;
-
-        return switch (command) {
-            case CommandTemplates.FEEDBACK -> processFeedback(message);
-            case CommandTemplates.MENU -> processMenu(message);
-            default -> processHelp(message);
-        };
+        return Mono.empty();
     }
 
-    private Mono<Void> processMenu(Message message) {
-        return null;
-    }
-
-    private boolean isDiscordMineSync(User author) {
-
-        return true;
-    }
-
-    private Mono<Void> processFeedback(Message message) {
-
-
-        return processCommand(message, ResponseTemplate.MOAN);
-    }
-
-    private Mono<Void> processHelp(Message message) {
-        return processCommand(message, ResponseTemplate.HELP);
-    }
-
-    private Mono<Void> processUnlinkedAccount(Message message) {
-        return processCommand(message, ResponseTemplate.UNLINKED, Button.link("https://bcraft.fun/accounts/profile/", "Підключити"));
-    }
 }

@@ -5,12 +5,15 @@ import bts.delation.model.DiscordUser;
 import bts.delation.repo.DiscordUserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -19,9 +22,16 @@ public class DiscordUserService {
     private final DiscordUserRepo discordUserRepo;
     private final RestTemplate restTemplate;
 
-    public DiscordUser save(DiscordUser discordUser) {
+    public List<DiscordUser> findAllUsers() {
+        return discordUserRepo.findAll();
+    }
 
-        return discordUserRepo.save(discordUser);
+    public void saveAndSync(String id, String name) {
+        DiscordUser save = discordUserRepo.save(new DiscordUser(id, name));
+
+        try {
+            syncUserWithMine(save.getId(), save.getDiscordUsername());
+        } catch (Exception e) {}
     }
 
     public DiscordUser getById(String id) {
@@ -54,6 +64,29 @@ public class DiscordUserService {
     public DiscordUser getByUsername(String username) {
         return discordUserRepo.findDiscordUserByDiscordUsername(username)
                 .orElseThrow(() -> new NotFoundException("Discord user not found"));
+    }
+
+    public Optional<DiscordUser> getNotSyncedUser() {
+        return discordUserRepo.findNotSynced()
+                .stream().findFirst();
+    }
+
+    @Async
+    public void saveBulk(List<DiscordUser> users) {
+        List<List<DiscordUser>> lists = splitListIntoChunks(users, 20);
+
+        lists.forEach(discordUserRepo::saveAll);
+    }
+
+    private static <T> List<List<T>> splitListIntoChunks(List<T> list, int chunkSize) {
+        return IntStream.range(0, (list.size() + chunkSize - 1) / chunkSize)
+                .mapToObj(i -> list.subList(i * chunkSize, Math.min((i + 1) * chunkSize, list.size())))
+                .collect(Collectors.toList());
+    }
+
+    private DiscordUser save(DiscordUser discordUser) {
+
+        return discordUserRepo.save(discordUser);
     }
 
     private boolean syncUserWithMine(String id, String name) {
