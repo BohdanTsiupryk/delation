@@ -8,6 +8,7 @@ import bts.delation.model.User;
 import bts.delation.model.enums.FeedbackType;
 import bts.delation.model.enums.Status;
 import bts.delation.service.*;
+import bts.delation.uril.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteraction;
@@ -74,12 +75,8 @@ public class CommandListener implements DiscordEventListener<ApplicationCommandI
 
 
         StringBuilder sb = new StringBuilder(ResponseTemplate.STATUS_TASK_LIST);
-        feedbacks.forEach(f -> sb.append("[")
-                .append(f.getId())
-                .append("]")
-                .append("(")
-                .append(publicFeedbackUrl(f.getId().toString()))
-                .append(")")
+        feedbacks.forEach(f -> sb
+                .append(DiscordUtil.buildLinkPlaceholder(f.getId().toString(), publicFeedbackUrl(f.getId().toString())))
                 .append(" | ")
                 .append(f.getStatus())
                 .append(" | ")

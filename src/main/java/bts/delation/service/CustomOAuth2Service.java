@@ -20,7 +20,6 @@ public class CustomOAuth2Service extends OidcUserService {
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
         OidcUser oidcUser = super.loadUser(userRequest);
 
-        System.out.println("__CustomOAuth2Service");
         String email = oidcUser.getEmail();
 
         User user = null;
