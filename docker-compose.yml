@@ -16,13 +16,11 @@ services:
     image: bohdantsiupryk/git-backup:latest
     restart: always
     ports:
-      - "8880:8880"
+      - "9999:9999"
     environment:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=1
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/bu
       - DISCORD_KEY=code
-    volumes:
-      - E:\testbu135:/vol/
     depends_on:
       - db
