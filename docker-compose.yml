@@ -1,0 +1,27 @@
+version: '3'
+services:
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: "bu"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "1"
+
+  server:
+    image: bohdantsiupryk/git-backup:latest
+    restart: always
+    ports:
+      - "8880:8880"
+    environment:
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=1
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/bu
+    volumes:
+      - E:\testbu135:/vol/
+    depends_on:
+      - db
