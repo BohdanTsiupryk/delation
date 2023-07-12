@@ -40,4 +40,4 @@ discord:
   key: ${DISCORD_KEY}
 
 host:
-  base-url: ${HOST}
+  base-url: ${HOST:http://localhost:9999}
