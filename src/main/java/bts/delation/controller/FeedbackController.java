@@ -82,8 +82,6 @@ public class FeedbackController {
         return "feedbacks";
     }
 
-
-
     @GetMapping("/{id}")
     public String page(@PathVariable Long id, Model model) {
 
