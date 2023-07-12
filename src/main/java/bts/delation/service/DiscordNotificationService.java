@@ -2,7 +2,6 @@ package bts.delation.service;
 
 import bts.delation.model.Feedback;
 import bts.delation.model.enums.Status;
-import bts.delation.uril.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.component.ActionRow;

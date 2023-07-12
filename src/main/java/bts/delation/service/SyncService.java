@@ -27,11 +27,15 @@ public class SyncService {
         return syncCode;
     }
 
-    public SyncCode getByCode(String code) {
-        return codeRepo.findByCode(code).orElseThrow(() -> new NotFoundException("Code not found"));
+    public Optional<SyncCode> getByCode(String code) {
+        return codeRepo.findByCode(code);
     }
 
     public Optional<SyncCode> getDiscordCode(User user) {
         return codeRepo.findByUserIdAndTarget(user.getId(), SyncTarget.DISCORD);
+    }
+
+    public void remove(SyncCode code) {
+        codeRepo.delete(code);
     }
 }
