@@ -1,10 +1,10 @@
 <#include "parts/security.ftl">
 <#import "parts/common.ftl" as c>
+<#import "parts/security.ftl" as sec>
 
 
 <@c.page>
-    <#if role == "ADMIN" || role == "MODER">
-
+    <@sec.show isAdmin || isModer>
         <div class="container">
             <div class="card">
                 <div class="card-header">
@@ -74,5 +74,5 @@
                 </ul>
             </div>
         </div>
-    </#if>
+    </@sec.show>
 </@c.page>

@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,16 +32,13 @@ public class FeedbackService {
     private final HistoryService historyService;
 
 
-    public FeedbackPage getAll(UserRole role, FeedbackSearchQuery query) {
+    public FeedbackPage getAll(FeedbackSearchQuery query, Predicate<Feedback> predicate) {
 
-        List<Feedback> feedbacks = feedbackSearchService.searchByQuery(query);
+        List<Feedback> result = feedbackSearchService.searchByQuery(query)
+                .stream()
+                .filter(predicate)
+                .toList();
         long total = feedbackSearchService.countByQuery(query);
-
-        List<Feedback> result = switch (role) {
-            case ADMIN -> feedbacks;
-            case MODER -> feedbacks.stream().filter(feedback -> !feedback.getType().equals(FeedbackType.APPEAL_MODER)).toList();
-            case CLIENT -> Collections.emptyList();
-        };
 
         return new FeedbackPage(result, query.page(), query.size(), total);
     }

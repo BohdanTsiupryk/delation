@@ -48,18 +48,19 @@ public class FeedbackController {
         Status status1 = parseStatus(status);
         Integer parsedPage = page == null ? 0 : page;
 
-        FeedbackPage result = feedbackService.getAll(user.getRole(), new FeedbackSearchQuery(
+        FeedbackPage result = feedbackService.getAll(new FeedbackSearchQuery(
                 feedbackType == null ? Collections.emptyList() : Collections.singletonList(feedbackType),
                 status1 == null ? Collections.emptyList() : Collections.singletonList(status1),
                 parsedPage,
                 10
-        ));
+        ), feedback -> !feedback.getType().equals(FeedbackType.APPEAL_MODER));
+
         List<FeedbackDTO> all = result
                 .feedbacks()
                 .stream()
                 .sorted(Comparator.comparing(Feedback::getCreatedAt).reversed())
                 .sorted(Comparator.comparing(feedback -> feedback.getStatus().priority()))
-                .map(this::mapToDto)
+                .map(FeedbackController::mapToDto)
                 .toList();
 
         List<UserDTO> moders = userService.findModers()
@@ -81,36 +82,7 @@ public class FeedbackController {
         return "feedbacks";
     }
 
-    @GetMapping("/client")
-    public String clientPage(
-            @AuthenticationPrincipal CustomOAuth2User user,
-            @RequestParam(required = false) Integer page,
-            Model model
-    ) {
-        Integer parsedPage = page == null ? 0 : page;
 
-        FeedbackPage result = feedbackService.getAll(user.getRole(), new FeedbackSearchQuery(
-                Collections.singletonList(FeedbackType.FEEDBACK),
-                Collections.singletonList(Status.DONE),
-                parsedPage,
-                10
-        ));
-        List<FeedbackDTO> all = result
-                .feedbacks()
-                .stream()
-                .sorted(Comparator.comparing(Feedback::getCreatedAt).reversed())
-                .sorted(Comparator.comparing(feedback -> feedback.getStatus().priority()))
-                .map(this::mapToDto)
-                .toList();
-
-        model.addAttribute("feedbacks", all)
-                .addAttribute("currentPage", result.page())
-                .addAttribute("currentPageSize", result.size())
-                .addAttribute("currentTotal", result.total())
-                .addAttribute("listPageNumbers", IntStream.range(0, ((int) (result.total() / result.size())) + 1).toArray());
-
-        return "client-feedbacks";
-    }
 
     @GetMapping("/{id}")
     public String page(@PathVariable Long id, Model model) {
@@ -215,7 +187,7 @@ public class FeedbackController {
         return feedbackType;
     }
 
-    public FeedbackDTO mapToDto(Feedback feedback) {
+    public static FeedbackDTO mapToDto(Feedback feedback) {
         return new FeedbackDTO(
                 feedback.getId(),
                 feedback.getAuthor().getDiscordUsername(),

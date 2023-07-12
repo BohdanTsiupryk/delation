@@ -1,10 +1,11 @@
 <#import "parts/common.ftl" as c>
+<#import "parts/security.ftl" as sec>
 <#include "parts/security.ftl">
 
 
 <@c.page>
 
-    <#if role == "ADMIN">
+    <@sec.show isAdmin>
         <table class="table-container">
             <thead>
             <tr>
@@ -64,9 +65,6 @@
             </tbody>
         </table>
 
-    <#else>
-
-        <h1>Have no access</h1>
-    </#if>
+    </@sec.show>
 
 </@c.page>

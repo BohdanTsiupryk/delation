@@ -1,5 +1,6 @@
 <#include "parts/security.ftl">
 <#import "parts/common.ftl" as c>
+<#import "parts/security.ftl" as sec>
 
 
 <@c.page>
@@ -47,12 +48,12 @@
         </div>
     </div>
     <hr>
-    <#if delation??>
+    <@sec.show delation??>
         <ul class="list-group">
             <#list delation as d>
                 <li class="list-group-item">${d.id()} - ${d.type()} - ${d.status()}</li>
             </#list>
         </ul>
-    </#if>
+    </@sec.show>
 
 </@c.page>

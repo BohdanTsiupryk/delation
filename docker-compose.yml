@@ -13,7 +13,7 @@ services:
       POSTGRES_PASSWORD: "1"
 
   server:
-    image: bohdantsiupryk/git-backup:latest
+    image: bohdantsiupryk/delation:latest
     restart: always
     ports:
       - "9999:9999"
@@ -22,5 +22,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=1
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/bu
       - DISCORD_KEY=code
+      - GOOGLE_ID=code
+      - GOOGLE_SECRET=code
     depends_on:
       - db

@@ -5,8 +5,8 @@ logging:
     web: info
     root: info
     bts: debug
-spring:
 
+spring:
   freemarker:
     template-loader-path: classpath:/templates/
     suffix: .ftl

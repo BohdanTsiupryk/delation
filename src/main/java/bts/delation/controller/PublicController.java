@@ -1,19 +1,23 @@
 package bts.delation.controller;
 
 import bts.delation.exception.NotFoundException;
+import bts.delation.model.CustomOAuth2User;
+import bts.delation.model.Feedback;
+import bts.delation.model.dto.FeedbackDTO;
+import bts.delation.model.dto.FeedbackPage;
+import bts.delation.model.enums.FeedbackType;
+import bts.delation.model.enums.Status;
+import bts.delation.repo.dto.FeedbackSearchQuery;
 import bts.delation.service.FeedbackService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.ZoneOffset;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/public")
@@ -43,6 +47,37 @@ public class PublicController {
         model.addAttribute("feedback", optionalPublicFeedbackDto.get());
 
         return "public-feedback";
+    }
+
+    @GetMapping("/feedbacks")
+    public String clientPage(
+            @RequestParam(required = false) Integer page,
+            Model model
+    ) {
+        Integer parsedPage = page == null ? 0 : page;
+
+        FeedbackPage result = feedbackService.getAll(new FeedbackSearchQuery(
+                Collections.singletonList(FeedbackType.FEEDBACK),
+                Collections.singletonList(Status.DONE),
+                parsedPage,
+                10
+        ), feedback -> true);
+
+        List<FeedbackDTO> all = result
+                .feedbacks()
+                .stream()
+                .sorted(Comparator.comparing(Feedback::getCreatedAt).reversed())
+                .sorted(Comparator.comparing(feedback -> feedback.getStatus().priority()))
+                .map(FeedbackController::mapToDto)
+                .toList();
+
+        model.addAttribute("feedbacks", all)
+                .addAttribute("currentPage", result.page())
+                .addAttribute("currentPageSize", result.size())
+                .addAttribute("currentTotal", result.total())
+                .addAttribute("listPageNumbers", IntStream.range(0, ((int) (result.total() / result.size())) + 1).toArray());
+
+        return "client-feedbacks";
     }
 
     @ExceptionHandler(NotFoundException.class)

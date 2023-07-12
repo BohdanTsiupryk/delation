@@ -1,10 +1,10 @@
 <#include "parts/security.ftl">
 <#import "parts/common.ftl" as c>
+<#import "parts/security.ftl" as sec>
 
 
 <@c.page>
-    <#if role == "ADMIN" || role == "MODER">
-
+    <@sec.show isAdmin || isModer>
         <#if filterCurrentStatus??> <#assign currentStatus = filterCurrentStatus><#else><#assign currentStatus = ''> </#if>
         <#if filterCurrentType??> <#assign currentType = filterCurrentType><#else><#assign currentType = ''> </#if>
 
@@ -93,8 +93,5 @@
             </#list>
             </tbody>
         </table>
-
-    </#if>
-
-
+    </@sec.show>
 </@c.page>
