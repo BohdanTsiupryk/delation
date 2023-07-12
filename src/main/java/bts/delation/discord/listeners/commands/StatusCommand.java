@@ -6,6 +6,7 @@ import bts.delation.model.Feedback;
 import bts.delation.service.FeedbackService;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class StatusCommand implements SlashCommand {
 
@@ -29,7 +31,7 @@ public class StatusCommand implements SlashCommand {
     @Override
     public Mono<Void> handle(ChatInputInteractionEvent event) {
 
-        System.out.println(baseHostUrl);
+        log.error(baseHostUrl);
 
         String userID = event.getInteraction().getUser().getId().asString();
         List<Feedback> feedbacks = feedbackService.getByAuthor(userID);
