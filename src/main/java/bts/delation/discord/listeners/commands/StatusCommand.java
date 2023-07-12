@@ -29,6 +29,8 @@ public class StatusCommand implements SlashCommand {
     @Override
     public Mono<Void> handle(ChatInputInteractionEvent event) {
 
+        System.out.println(baseHostUrl);
+
         String userID = event.getInteraction().getUser().getId().asString();
         List<Feedback> feedbacks = feedbackService.getByAuthor(userID);
 
