@@ -1,5 +1,6 @@
 package bts.delation.discord.listeners.commands;
 
+import bts.delation.discord.DiscordDailyService;
 import bts.delation.discord.templates.ResponseTemplate;
 import bts.delation.model.DiscordUser;
 import bts.delation.model.Feedback;
@@ -11,17 +12,20 @@ import bts.delation.service.HistoryService;
 import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteraction;
+import discord4j.core.object.component.ActionRow;
+import discord4j.core.object.component.Button;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
+import discord4j.core.spec.InteractionApplicationCommandCallbackSpec;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static bts.delation.discord.DiscordUtils.*;
@@ -33,6 +37,7 @@ public class FeedbackCommand implements SlashCommand {
     private final FeedbackService feedbackService;
     private final DiscordUserService discordUserService;
     private final HistoryService historyService;
+    private final DiscordDailyService discordDailyService;
 
     @Value("${host.base-url}")
     private String baseHostUrl;
@@ -45,8 +50,12 @@ public class FeedbackCommand implements SlashCommand {
     @Override
     public Mono<Void> handle(ChatInputInteractionEvent event) {
 
-        String author = event.getInteraction().getUser().getUsername();
+        User user = event.getInteraction().getUser();
+        String author = user.getUsername();
         Optional<ApplicationCommandInteraction> commandInteraction = event.getInteraction().getCommandInteraction();
+
+        if (!discordDailyService.checkDailyAndIncrement(user.getId().asString()))
+            return event.reply(ResponseTemplate.OUT_MESSAGE_LIMIT).withEphemeral(true);
 
         FeedbackType type = FeedbackType.getTypeByValue(getOption(commandInteraction, "type"));
         String value = getOption(commandInteraction, "value");
@@ -97,4 +106,5 @@ public class FeedbackCommand implements SlashCommand {
                 event.getInteraction().getGuildId().get().asString()
         ));
     }
+
 }
