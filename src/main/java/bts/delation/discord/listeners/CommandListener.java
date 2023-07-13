@@ -8,6 +8,7 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.component.ActionRow;
 import discord4j.core.object.component.Button;
 import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.User;
 import discord4j.core.spec.InteractionApplicationCommandCallbackSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,7 @@ public class CommandListener implements DiscordEventListener<ChatInputInteractio
     @Override
     public Mono<Void> execute(ChatInputInteractionEvent event) {
 
-        Member member = event.getInteraction().getUser().asMember(Snowflake.of(1106357010334744697L)).block();
+        User member = event.getInteraction().getUser();
 
         if (!discordUserService.checkUserAutorize(member.getId().asString(), member.getUsername())) {
 
