@@ -39,8 +39,8 @@ public class AdminController {
         return "admin-page";
     }
 
-    @GetMapping("/guild/sync/{id}")
-    public String syncGuild(String id) {
+    @GetMapping("/guild/sync")
+    public String syncGuild(@RequestParam("id") String id) {
 
         discordService.saveUsersToDb(id);
 
