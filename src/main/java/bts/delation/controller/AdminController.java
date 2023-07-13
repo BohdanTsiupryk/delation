@@ -31,7 +31,7 @@ public class AdminController {
     public String adminPage(Model model) {
 
         List<User> users = userService.getUsers();
-        List<DiscordUser> discordUsers = discordUserService.findAllUsers();
+        List<DiscordUser> discordUsers = discordUserService.findAllSyncUsers();
 
         model.addAttribute("users", users);
         model.addAttribute("discordUsers", discordUsers);

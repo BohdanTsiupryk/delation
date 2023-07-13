@@ -26,6 +26,10 @@ public class DiscordUserService {
         return discordUserRepo.findAll();
     }
 
+    public List<DiscordUser> findAllSyncUsers() {
+        return discordUserRepo.findAllBySyncWithMineTrue();
+    }
+
     public void saveAndSync(String id, String name) {
         DiscordUser save = discordUserRepo.save(new DiscordUser(id, name));
 
