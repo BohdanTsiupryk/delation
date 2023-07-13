@@ -39,10 +39,10 @@ public class AdminController {
         return "admin-page";
     }
 
-    @GetMapping("/guild/sync")
-    public String syncGuild() {
+    @GetMapping("/guild/sync/{id}")
+    public String syncGuild(String id) {
 
-        discordService.saveUsersToDb("1106357010334744697");
+        discordService.saveUsersToDb(id);
 
         return "redirect:/admin";
     }
