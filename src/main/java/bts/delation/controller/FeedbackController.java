@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -48,12 +49,18 @@ public class FeedbackController {
         Status status1 = parseStatus(status);
         Integer parsedPage = page == null ? 0 : page;
 
+        Predicate<Feedback> feedbackPredicate = switch (user.getRole()) {
+            case CLIENT -> f -> false;
+            case MODER -> f -> !f.getType().equals(FeedbackType.APPEAL_MODER);
+            case ADMIN -> f -> true;
+        };
+
         FeedbackPage result = feedbackService.getAll(new FeedbackSearchQuery(
                 feedbackType == null ? Collections.emptyList() : Collections.singletonList(feedbackType),
                 status1 == null ? Collections.emptyList() : Collections.singletonList(status1),
                 parsedPage,
                 10
-        ), feedback -> !feedback.getType().equals(FeedbackType.APPEAL_MODER));
+        ), feedbackPredicate);
 
         List<FeedbackDTO> all = result
                 .feedbacks()
