@@ -87,6 +87,8 @@ public class FeedbackService {
 
     public Feedback save(Feedback feedback) {
 
+        historyService.taskCreated(feedback, feedback.getAuthor().getDiscordUsername());
+
         handleByType(feedback);
 
         return repo.save(feedback);
