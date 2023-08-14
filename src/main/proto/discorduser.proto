@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package bts.delation.grpc;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service DiscordUserApi {
+  rpc save(IdUsernameRequest) returns (google.protobuf.Empty);
+  rpc checkAuthorize(IdUsernameRequest) returns (authorizeResponse);
+}
+
+message IdUsernameRequest {
+  string id = 1;
+  string username = 2;
+}
+
+message authorizeResponse {
+   bool authorize = 1;
+}

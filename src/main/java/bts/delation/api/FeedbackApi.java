@@ -1,90 +1,94 @@
 package bts.delation.api;
 
+import bts.delation.grpc.FeedbackApiGrpc.FeedbackApiImplBase;
+import bts.delation.grpc.FeedbackOuterClass;
 import bts.delation.model.DiscordUser;
 import bts.delation.model.Feedback;
 import bts.delation.model.enums.FeedbackType;
 import bts.delation.model.enums.Status;
 import bts.delation.service.DiscordUserService;
 import bts.delation.service.FeedbackService;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.protobuf.Timestamp;
+import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 
-@RestController
+@Service
 @RequiredArgsConstructor
-@RequestMapping("/api/feedback")
-public class FeedbackApi {
+public class FeedbackApi extends FeedbackApiImplBase {
 
     private final FeedbackService feedbackService;
     private final DiscordUserService discordUserService;
 
-    @PostMapping
-    public ResponseEntity<FeedbackDto> save(@RequestBody FeedbackDto feedback) {
+    @Override
+    public void getAllByUserId(FeedbackOuterClass.UserIdRequest request, StreamObserver<FeedbackOuterClass.FeedbackList> responseObserver) {
 
-        DiscordUser discordUser = discordUserService.getById(feedback.author());
+        List<Feedback> feedbacks = feedbackService.getByAuthor(request.getId());
 
-        Feedback save = feedbackService.save(feedback.toEntity(discordUser));
-        return ResponseEntity.ok(new FeedbackDto(save));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<FeedbackDto>> getAll(@RequestParam(value = "ds_user_id", required = false) String id) {
-
-        List<Feedback> feedbacks = Objects.nonNull(id) ?
-                feedbackService.getByAuthor(id) :
-                feedbackService.getAll();
-
-        List<FeedbackDto> list = feedbacks
+        FeedbackOuterClass.FeedbackList.Builder builder = FeedbackOuterClass.FeedbackList.newBuilder();
+        feedbacks
                 .stream()
-                .map(FeedbackDto::new)
-                .toList();
-        return ResponseEntity.ok(list);
-    }
-}
+                .map(this::toDto)
+                .forEach(builder::addList);
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-record FeedbackDto(
-        String id,
-        String author,
-        Collection<String> mentions,
-        String text,
-        String attUrl,
-        String status,
-        FeedbackType type,
-        LocalDateTime date,
-        String guildId
-) {
-    public FeedbackDto(Feedback feedback) {
-        this(
-                feedback.getId().toString(),
-                feedback.getAuthor().getDiscordUsername(),
-                feedback.getMentions(),
-                feedback.getText(),
-                feedback.getAttachmentUrl(),
-                feedback.getStatus().name(),
-                feedback.getType(),
-                feedback.getCreatedAt(),
-                feedback.getGuildId()
-        );
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
     }
 
-    public Feedback toEntity(DiscordUser discordUser) {
+    @Override
+    public void save(FeedbackOuterClass.Feedback request, StreamObserver<FeedbackOuterClass.Feedback> responseObserver) {
+        DiscordUser discordUser = discordUserService.getById(request.getAuthor());
+
+        Feedback save = feedbackService.save(toEntity(request, discordUser));
+
+        responseObserver.onNext(toDto(save));
+        responseObserver.onCompleted();
+    }
+
+    private Feedback toEntity(FeedbackOuterClass.Feedback req, DiscordUser discordUser) {
+
+        Timestamp timestamp = req.getDate();
+        Instant instant = Instant.ofEpochSecond(timestamp.getSeconds(), timestamp.getNanos());
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+
         return new Feedback(
                 discordUser,
-                new HashSet<>(this.mentions),
-                this.text,
-                Status.valueOf(this.status),
-                this.attUrl,
-                this.type,
-                this.date,
-                this.guildId
+                new HashSet<>(req.getMentionsList()),
+                req.getText(),
+                Status.valueOf(req.getStatus()),
+                req.getAttUrl(),
+                FeedbackType.valueOf(req.getType()),
+                localDateTime,
+                req.getGuildId()
         );
     }
+
+    private FeedbackOuterClass.Feedback toDto(Feedback feedback) {
+
+        Instant instant = feedback.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant();
+        Timestamp timestamp = Timestamp.newBuilder()
+                .setSeconds(instant.getEpochSecond())
+                .setNanos(instant.getNano())
+                .build();
+
+        return FeedbackOuterClass.Feedback.newBuilder()
+                .setId(feedback.getId().toString())
+                .setAuthor(feedback.getAuthor().getId())
+                .addAllMentions(feedback.getMentions())
+                .setText(feedback.getText())
+                .setAttUrl(feedback.getAttachmentUrl())
+                .setStatus(feedback.getStatus().name())
+                .setType(feedback.getType().name())
+                .setDate(timestamp)
+                .setGuildId(feedback.getGuildId())
+                .build();
+    }
+
 }
+

@@ -30,27 +30,27 @@ public class DiscordConfig {
                 .gateway()
                 .setEnabledIntents(IntentSet.all())
                 .login().block();
-
-        Long appId = client.getRestClient().getApplicationId().block();
-
-        ApplicationCommandRequest feedbackCommand = createFeedbackCommand();
-        ApplicationCommandRequest statusCommand = createStatusCommand();
-        ApplicationCommandRequest helpCommand = createHelpCommand();
-        ImmutableApplicationCommandRequest syncCommand = createSyncCommand();
-
-        client.getRestClient().getApplicationService()
-                .bulkOverwriteGlobalApplicationCommand(
-                        appId,
-                        List.of(feedbackCommand, statusCommand, syncCommand, helpCommand)
-                )
-                .subscribe();
-
-        listeners.forEach(listener -> {
-            client.on(listener.getEventType())
-                    .flatMap(listener::execute)
-                    .onErrorResume(listener::handleError)
-                    .subscribe();
-        });
+//
+//        Long appId = client.getRestClient().getApplicationId().block();
+//
+//        ApplicationCommandRequest feedbackCommand = createFeedbackCommand();
+//        ApplicationCommandRequest statusCommand = createStatusCommand();
+//        ApplicationCommandRequest helpCommand = createHelpCommand();
+//        ImmutableApplicationCommandRequest syncCommand = createSyncCommand();
+//
+//        client.getRestClient().getApplicationService()
+//                .bulkOverwriteGlobalApplicationCommand(
+//                        appId,
+//                        List.of(feedbackCommand, statusCommand, syncCommand, helpCommand)
+//                )
+//                .subscribe();
+//
+//        listeners.forEach(listener -> {
+//            client.on(listener.getEventType())
+//                    .flatMap(listener::execute)
+//                    .onErrorResume(listener::handleError)
+//                    .subscribe();
+//        });
 
         return client;
     }

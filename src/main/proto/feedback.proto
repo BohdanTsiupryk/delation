@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package bts.delation.grpc;
+
+import "google/protobuf/timestamp.proto";
+
+service FeedbackApi {
+  rpc getAllByUserId(UserIdRequest) returns (FeedbackList);
+  rpc save(Feedback) returns (Feedback);
+}
+
+message UserIdRequest {
+  string id = 1;
+}
+
+message FeedbackList {
+  repeated Feedback list = 1;
+}
+
+message Feedback {
+  string id = 1;
+  string author = 2;
+  repeated string mentions = 3;
+  string text = 4;
+  string attUrl = 5;
+  string status = 6;
+  string type = 7;
+  google.protobuf.Timestamp date = 8;
+  string guildId = 9;
+}
