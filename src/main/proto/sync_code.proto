@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package bts.delation.grpc;
+
+service SyncApi {
+  rpc checkCode(Request) returns (Response);
+}
+
+message Request {
+  string id = 1;
+  string code = 2;
+}
+
+message Response {
+   bool accepted = 1;
+}

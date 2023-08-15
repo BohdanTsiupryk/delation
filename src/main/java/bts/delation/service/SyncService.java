@@ -27,15 +27,14 @@ public class SyncService {
         return syncCode;
     }
 
-    public Optional<SyncCode> getByCode(String code) {
-        return codeRepo.findByCode(code);
-    }
-
     public Optional<SyncCode> getDiscordCode(User user) {
         return codeRepo.findByUserIdAndTarget(user.getId(), SyncTarget.DISCORD);
     }
 
-    public void remove(SyncCode code) {
-        codeRepo.delete(code);
+
+    public boolean checkCode(String id, String code) {
+        return codeRepo.findByUserIdAndTarget(id, SyncTarget.DISCORD)
+                .map(c -> c.getCode().equals(code))
+                .orElse(false);
     }
 }

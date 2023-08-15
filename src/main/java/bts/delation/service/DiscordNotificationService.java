@@ -3,7 +3,6 @@ package bts.delation.service;
 import bts.delation.model.Feedback;
 import bts.delation.model.enums.Status;
 import discord4j.common.util.Snowflake;
-import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.component.ActionRow;
 import discord4j.core.object.component.Button;
 import discord4j.core.spec.MessageCreateSpec;
@@ -21,7 +20,6 @@ public class DiscordNotificationService {
 
     private final UserService userService;
     private final FeedbackService feedbackService;
-    private final GatewayDiscordClient client;
 
     @Value("${host.base-url}")
     private String baseHostUrl;
@@ -34,15 +32,15 @@ public class DiscordNotificationService {
                 .map(a -> Snowflake.of(a.getDiscordUser().getId()))
                 .collect(Collectors.toSet());
 
-        client.getGuildById(Snowflake.of(guildId))
-                .flatMap(g ->
-                        g.requestMembers(snowflakes)
-                                .flatMap(m -> m.getPrivateChannel().flatMap(c -> c.createMessage(MessageCreateSpec.builder()
-                                                .addComponent(ActionRow.of(button))
-                                                .content(reason)
-                                        .build())))
-                                .then()
-                ).subscribe();
+//        client.getGuildById(Snowflake.of(guildId))
+//                .flatMap(g ->
+//                        g.requestMembers(snowflakes)
+//                                .flatMap(m -> m.getPrivateChannel().flatMap(c -> c.createMessage(MessageCreateSpec.builder()
+//                                                .addComponent(ActionRow.of(button))
+//                                                .content(reason)
+//                                        .build())))
+//                                .then()
+//                ).subscribe();
     }
 
     public void notifyTaskStatusChanged(Long feedbackId, Status newStatus) {
