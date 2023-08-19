@@ -23,7 +23,6 @@ import java.util.List;
 public class AdminController {
 
     private final UserService userService;
-    private final DiscordService discordService;
     private final DiscordUserService discordUserService;
 
     @GetMapping
@@ -36,14 +35,6 @@ public class AdminController {
         model.addAttribute("discordUsers", discordUsers);
         model.addAttribute("roles", UserRole.values());
         return "admin-page";
-    }
-
-    @GetMapping("/guild/sync")
-    public String syncGuild(@RequestParam("id") String id) {
-
-        discordService.saveUsersToDb(id);
-
-        return "redirect:/admin";
     }
 
     @PostMapping("/change-role")
