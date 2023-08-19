@@ -4,7 +4,6 @@ import bts.delation.model.CustomOAuth2User;
 import bts.delation.model.DiscordUser;
 import bts.delation.model.User;
 import bts.delation.model.enums.UserRole;
-import bts.delation.service.DiscordService;
 import bts.delation.service.DiscordUserService;
 import bts.delation.service.UserService;
 import lombok.RequiredArgsConstructor;

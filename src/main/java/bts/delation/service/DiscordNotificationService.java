@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DiscordNotificationService {
 
-    private final UserService userService;
     private final NotificationApiGrpc.NotificationApiFutureStub notificationApi;
 
     @Value("${host.base-url}")
