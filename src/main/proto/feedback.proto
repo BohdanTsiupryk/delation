@@ -7,9 +7,14 @@ import "google/protobuf/timestamp.proto";
 service FeedbackApi {
   rpc getAllByUserId(UserIdRequest) returns (FeedbackList);
   rpc save(Feedback) returns (Feedback);
+  rpc getById(FeedbackIdRequest) returns (Feedback);
 }
 
 message UserIdRequest {
+  string id = 1;
+}
+
+message FeedbackIdRequest {
   string id = 1;
 }
 

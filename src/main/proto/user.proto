@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package bts.delation.grpc;
+
+import "google/protobuf/empty.proto";
+
+
+service UserApi{
+    rpc GetAdmins(google.protobuf.Empty) returns (AdminsResponse) {}
+}
+
+message AdminsResponse{
+    repeated string admins = 1;
+}

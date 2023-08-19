@@ -36,8 +36,9 @@ spring:
               - openid
               - email
               - profile
-discord:
-  key: ${DISCORD_KEY}
 
+grpc:
+  discord:
+    url: "localhost:9001"
 host:
   base-url: ${BASE_HOST}

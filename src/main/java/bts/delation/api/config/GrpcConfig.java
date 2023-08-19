@@ -1,20 +1,37 @@
 package bts.delation.api.config;
 
-import bts.delation.api.FeedbackApi;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
-import lombok.extern.log4j.Log4j;
+import bts.delation.grpc.NotificationApiGrpc;
+import io.grpc.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class GrpcConfig {
 
+    @Value("${grpc.discord.url}")
+    private String discordUrl;
+
     @Bean
-    public Server serverConfig(@Autowired FeedbackApi feedbackApi) {
-        return ServerBuilder.forPort(9900)
-                .addService(feedbackApi)
-                .build();
+    public ManagedChannel channel() {
+        return ManagedChannelBuilder.forTarget(discordUrl)
+                .usePlaintext().build();
+    }
+
+    @Bean
+    public Server serverConfig(@Autowired List<BindableService> feedbackApi) {
+        ServerBuilder<?> serverBuilder = ServerBuilder.forPort(9900);
+
+        feedbackApi.forEach(serverBuilder::addService);
+
+        return serverBuilder.build();
+    }
+
+    @Bean
+    public NotificationApiGrpc.NotificationApiFutureStub userApi(ManagedChannel channel) {
+        return NotificationApiGrpc.newFutureStub(channel);
     }
 }

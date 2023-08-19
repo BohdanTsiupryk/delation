@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package bts.delation.grpc;
+
+import "google/protobuf/empty.proto";
+
+
+service NotificationApi {
+    rpc send (NotificationRequest) returns (google.protobuf.Empty);
+    rpc sendTaskChanged(TaskChangedRequest) returns (google.protobuf.Empty);
+}
+
+message TaskChangedRequest {
+    int64 taskId = 1;
+    string status = 2;
+    string url = 3;
+}
+
+message NotificationRequest {
+    repeated string users = 1;
+    string message = 2;
+    string guildId = 3;
+    repeated Button buttons = 4;
+}
+
+message Button {
+    string label = 1;
+    string url = 2;
+}
+
